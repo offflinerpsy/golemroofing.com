@@ -1,0 +1,31 @@
+# WordPress Core (we only track custom code)
+*.log
+*.sql
+*.sqlite
+.htaccess
+wp-config.php
+
+# Dependencies
+node_modules/
+vendor/
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Backups
+*.bak
+*.backup
+*~
+
+# Environment
+.env
+.env.*
+
+# Debug
+debug.log
+error_log

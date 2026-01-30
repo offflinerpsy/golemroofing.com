@@ -1,0 +1,54 @@
+name: 🚀 Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SERVER_HOST: 5.78.65.51
+  SERVER_USER: root
+  DEPLOY_PATH: /home/admin/web/golemroofing.com/public_html
+
+jobs:
+  deploy:
+    name: 📦 Deploy WordPress Custom Code
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔑 Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 📤 Deploy mu-plugins
+        run: |
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            wp-content/mu-plugins/ \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/wp-content/mu-plugins/
+
+      - name: 📤 Deploy robots.txt
+        run: |
+          rsync -avz \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            robots.txt \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/robots.txt
+
+      - name: 🧹 Clear WordPress Cache
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} \
+            "cd ${{ env.DEPLOY_PATH }} && wp cache flush --allow-root 2>/dev/null || true"
+
+      - name: ✅ Deployment Complete
+        run: |
+          echo "🎉 Successfully deployed to golemroofing.com!"
+          echo "📁 mu-plugins synced"
+          echo "🤖 robots.txt updated"
+          echo "🧹 Cache cleared"
