@@ -18,6 +18,8 @@ golemroofing.com/
 │   └── mu-plugins/        # Must-Use plugins (auto-loaded)
 │       ├── golem-schema.php      # Schema.org markup
 │       └── auto-alt-tags.php     # SEO image ALT generator
+├── snippets/              # Code Snippets (stored in DB, backup here)
+│   └── elementor-telegram.php    # Elementor Forms → Telegram
 ├── robots.txt             # Search engine directives
 └── README.md
 ```
@@ -40,6 +42,31 @@ Automatic ALT text generation for images:
 - Adds "Golem Roofing" branding suffix
 - Batch processing on admin load (50 images/run)
 - Hooks new uploads automatically
+
+---
+
+## 📱 Telegram Integration
+
+### `snippets/elementor-telegram.php`
+Sends Elementor form submissions to Telegram (multiple recipients).
+
+**⚠️ ВАЖНО:** Этот код хранится в **БД** (таблица `wp_snippets`), не в файлах!
+Файл в репозитории — это **бэкап/документация**.
+
+**Текущие получатели:**
+| Chat ID | Имя | Добавлен |
+|---------|-----|----------|
+| `705412224` | Андрей (@andrei_markovets) | Изначально |
+| `576534060` | Dmitry | 2026-02-02 |
+
+**Как добавить нового получателя:**
+1. Узнать chat_id (написать боту `@userinfobot`)
+2. Новый пользователь должен написать `/start` боту `@golemroofingbot`
+3. Обновить код в WP Admin → Snippets → ID #5
+4. Обновить файл `snippets/elementor-telegram.php` и закоммитить
+
+**Бот:** `@golemroofingbot`  
+**Плагин:** Code Snippets (WP Admin → Snippets)
 
 ---
 
@@ -104,6 +131,14 @@ git push origin main
 ---
 
 ## 📝 Changelog
+
+### 2026-02-02
+- ✅ Telegram интеграция: добавлен второй получатель форм (576534060, Dmitry)
+- ✅ Диагностика и исправление отправки форм Elementor
+- ✅ Документация Code Snippets в репозитории
+
+### 2026-01-31
+- 🔧 Исправлена критическая ошибка WP Telegram (формат JSON в БД)
 
 ### 2026-01-30
 - ✅ Initial repository setup
