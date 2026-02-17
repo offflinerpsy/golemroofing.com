@@ -117,9 +117,9 @@ add_action('template_redirect', function() {
             $thumb_id = get_post_thumbnail_id($post->ID);
             if (!$thumb_id) return $matches[0];
 
-            $img_data = wp_get_attachment_image_src($thumb_id, 'large');
+            $img_data = wp_get_attachment_image_src($thumb_id, 'full');
             if (!$img_data) {
-                $img_data = wp_get_attachment_image_src($thumb_id, 'medium_large');
+                $img_data = wp_get_attachment_image_src($thumb_id, 'large');
             }
             if (!$img_data) return $matches[0];
 
@@ -128,8 +128,8 @@ add_action('template_redirect', function() {
             $height = $img_data[2];
             $alt = esc_attr(get_post_meta($thumb_id, '_wp_attachment_image_alt', true) ?: $post->post_title);
 
-            $srcset = wp_get_attachment_image_srcset($thumb_id, 'large');
-            $sizes = wp_get_attachment_image_sizes($thumb_id, 'large');
+            $srcset = wp_get_attachment_image_srcset($thumb_id, 'full');
+            $sizes = wp_get_attachment_image_sizes($thumb_id, 'full');
 
             $img_tag = sprintf(
                 '<img src="%s" alt="%s" width="%d" height="%d" class="aux-attachment aux-featured-image"%s%s loading="lazy" />',
@@ -166,5 +166,5 @@ add_filter('auxin_get_responsive_thumbnail_args', function($args) {
 
 // ===== 5. USE LARGE IMAGES FOR THUMBNAILS =====
 add_filter('auxin_post_thumbnail_size', function($size) {
-    return 'large';
+    return 'full';
 }, 999);
