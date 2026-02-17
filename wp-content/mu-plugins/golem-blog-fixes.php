@@ -159,6 +159,19 @@ add_action('template_redirect', function() {
             $html
         );
 
+        // Remove srcset and sizes from blog listing images to force original src
+        // This prevents browser from picking cropped versions from srcset
+        $html = preg_replace(
+            '/(<div class="aux-media-frame[^>]*>.*?<img[^>]*?) srcset="[^"]*"/is',
+            '$1',
+            $html
+        );
+        $html = preg_replace(
+            '/(<div class="aux-media-frame[^>]*>.*?<img[^>]*?) sizes="[^"]*"/is',
+            '$1',
+            $html
+        );
+
         return $html;
     });
 });
