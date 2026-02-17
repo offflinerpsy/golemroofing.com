@@ -144,6 +144,21 @@ add_action('template_redirect', function() {
             return $before . $url . '">' . $img_tag . '</a>';
         }, $html);
 
+        // Also replace any cropped instagram image URLs with originals
+        // Pattern: filename-WIDTHxHEIGHT.webp → filename.webp
+        $html = preg_replace(
+            '/(\/wp-content\/uploads\/instagram\/[^"\']+)-\d+x\d+\.(webp|jpg|jpeg|png)/i',
+            '$1.$2',
+            $html
+        );
+
+        // Same for 2026/02 uploads folder
+        $html = preg_replace(
+            '/(\/wp-content\/uploads\/2026\/02\/[^"\']+)-\d+x\d+\.(webp|jpg|jpeg|png)/i',
+            '$1.$2',
+            $html
+        );
+
         return $html;
     });
 });
