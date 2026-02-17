@@ -53,7 +53,7 @@ add_action('wp_head', function() {
         overflow: hidden !important;
         height: auto !important;
         padding-bottom: 0 !important;
-        background: #f5f5f5 !important;
+        background: transparent !important;
     }
 
     /* Override Phlox inline padding-bottom */
@@ -64,14 +64,14 @@ add_action('wp_head', function() {
         height: auto !important;
     }
 
-    /* Images: show full image, no crop, no zoom */
+    /* Images: fill container, center on faces */
     .post.column-entry .entry-media .aux-media-frame img,
     .blog .entry-media .aux-media-frame img,
     .archive .entry-media .aux-media-frame img {
         width: 100% !important;
         height: 100% !important;
-        object-fit: contain !important;
-        object-position: center center !important;
+        object-fit: cover !important;
+        object-position: center 20% !important;
         display: block !important;
     }
 
