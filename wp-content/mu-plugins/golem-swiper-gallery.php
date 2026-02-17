@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Golem Instagram Gallery (Swiper) v2.1
- * Description: Modern Instagram-style gallery with Swiper.js - arrows inside, touch support, autoplay. Single-image galleries handled cleanly.
- * Version: 2.1.0
+ * Plugin Name: Golem Instagram Gallery (Swiper) v2.2
+ * Description: Modern Instagram-style gallery with Swiper.js + video Reel support. Arrows inside, touch, autoplay. Single-image galleries handled cleanly.
+ * Version: 2.2.0
  * Author: Golem Roofing
  * 
  * Based on official Swiper.js v11 documentation
@@ -233,6 +233,116 @@ function golem_swiper_v2_styles() {
 }
 
 /* ==========================================================================
+   VIDEO REEL STYLES
+   ========================================================================== */
+.golem-video-container {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    margin: 0 auto 32px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background: #1a1a1a !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+.golem-video-container video {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 750px !important;
+    display: block !important;
+    object-fit: contain !important;
+    background: #000 !important;
+}
+
+/* Play button overlay */
+.golem-video-play-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 5 !important;
+    background: rgba(0,0,0,0.15) !important;
+    transition: background 0.3s ease !important;
+}
+
+.golem-video-play-overlay:hover {
+    background: rgba(0,0,0,0.25) !important;
+}
+
+.golem-video-play-overlay.is-playing {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.golem-video-play-btn {
+    width: 72px !important;
+    height: 72px !important;
+    background: rgba(0,0,0,0.6) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    transition: transform 0.2s ease, background 0.2s ease !important;
+}
+
+.golem-video-play-overlay:hover .golem-video-play-btn {
+    transform: scale(1.1) !important;
+    background: rgba(0,0,0,0.75) !important;
+}
+
+.golem-video-play-btn::after {
+    content: '' !important;
+    display: block !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-style: solid !important;
+    border-width: 14px 0 14px 24px !important;
+    border-color: transparent transparent transparent #fff !important;
+    margin-left: 4px !important;
+}
+
+/* Reel badge */
+.golem-reel-badge {
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
+    z-index: 6 !important;
+    background: rgba(0,0,0,0.6) !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding: 4px 10px !important;
+    border-radius: 4px !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+}
+
+@media (max-width: 768px) {
+    .golem-video-container {
+        max-width: 100% !important;
+        margin: 0 0 24px !important;
+        border-radius: 0 !important;
+    }
+    .golem-video-play-btn {
+        width: 56px !important;
+        height: 56px !important;
+    }
+    .golem-video-play-btn::after {
+        border-width: 10px 0 10px 18px !important;
+    }
+}
+
+/* ==========================================================================
    NAVIGATION ARROWS - Instagram Style
    Positioned INSIDE the gallery with proper offset
    ========================================================================== */
@@ -431,15 +541,53 @@ function golem_swiper_v2_styles() {
 }
 
 /**
- * Shortcode: [golem_gallery images="url1,url2,url3"]
+ * Shortcode: [golem_gallery images="url1,url2,url3" video="video_url"]
+ * When video is provided, renders a playable video instead of image gallery.
  */
 add_shortcode('golem_gallery', 'golem_gallery_v2_shortcode');
 function golem_gallery_v2_shortcode($atts) {
     $atts = shortcode_atts([
         'images' => '',
+        'video'  => '',
         'autoplay' => '4000'
     ], $atts);
     
+    // VIDEO MODE: render a playable video Reel
+    if (!empty($atts['video'])) {
+        $video_url = esc_url($atts['video']);
+        // Use first image as poster if available
+        $poster = '';
+        if (!empty($atts['images'])) {
+            $images = array_map('trim', explode(',', $atts['images']));
+            $poster = esc_url($images[0]);
+        }
+        
+        ob_start();
+        ?>
+        <div class="golem-video-container">
+            <span class="golem-reel-badge">▶ Reel</span>
+            <div class="golem-video-play-overlay" onclick="this.classList.add('is-playing');this.parentElement.querySelector('video').play();">
+                <div class="golem-video-play-btn"></div>
+            </div>
+            <video 
+                <?php if ($poster): ?>poster="<?php echo $poster; ?>"<?php endif; ?>
+                preload="metadata"
+                playsinline
+                controls
+                controlslist="nodownload"
+                onclick="this.paused?this.play():this.pause();this.parentElement.querySelector('.golem-video-play-overlay').classList.toggle('is-playing',!this.paused);"
+                onpause="this.parentElement.querySelector('.golem-video-play-overlay').classList.remove('is-playing');"
+                onplay="this.parentElement.querySelector('.golem-video-play-overlay').classList.add('is-playing');"
+            >
+                <source src="<?php echo $video_url; ?>" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+    
+    // IMAGE GALLERY MODE (existing behavior)
     if (empty($atts['images'])) return '';
     
     $images = array_map('trim', explode(',', $atts['images']));
