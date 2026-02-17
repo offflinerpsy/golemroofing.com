@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Golem Instagram Gallery (Swiper) v2
- * Description: Modern Instagram-style gallery with Swiper.js - arrows inside, touch support, autoplay
- * Version: 2.0.0
+ * Plugin Name: Golem Instagram Gallery (Swiper) v2.1
+ * Description: Modern Instagram-style gallery with Swiper.js - arrows inside, touch support, autoplay. Single-image galleries handled cleanly.
+ * Version: 2.1.0
  * Author: Golem Roofing
  * 
  * Based on official Swiper.js v11 documentation
@@ -57,58 +57,46 @@ function golem_swiper_v2_init() {
             // Skip if already initialized
             if (el.swiper) return;
             
+            // Count actual slides
+            const slideCount = el.querySelectorAll('.swiper-slide').length;
+            const isSingle = slideCount <= 1;
+            
             // Get autoplay delay from data attribute or default
             const autoplayDelay = parseInt(el.dataset.autoplay) || 4000;
             
-            // Initialize Swiper with official API options
-            new Swiper(el, {
+            // Hide arrows and pagination for single-image galleries
+            if (isSingle) {
+                var prevBtn = el.querySelector('.swiper-button-prev');
+                var nextBtn = el.querySelector('.swiper-button-next');
+                var pagination = el.querySelector('.swiper-pagination');
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (nextBtn) nextBtn.style.display = 'none';
+                if (pagination) pagination.style.display = 'none';
+                el.classList.add('golem-single-image');
+            }
+            
+            // Build Swiper options — disable loop/autoplay for single images
+            var options = {
                 // Core
                 slidesPerView: 1,
                 spaceBetween: 0,
                 speed: 500,
-                grabCursor: true,
+                grabCursor: !isSingle,
                 
-                // Loop mode for seamless carousel
-                loop: true,
-                
-                // Autoplay module
-                autoplay: {
-                    delay: autoplayDelay,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: true
-                },
-                
-                // Navigation arrows
-                navigation: {
-                    nextEl: el.querySelector('.swiper-button-next'),
-                    prevEl: el.querySelector('.swiper-button-prev')
-                },
-                
-                // Pagination dots
-                pagination: {
-                    el: el.querySelector('.swiper-pagination'),
-                    clickable: true,
-                    dynamicBullets: true,
-                    dynamicMainBullets: 3
-                },
+                // Loop mode only for multi-image (requires 2+ slides)
+                loop: !isSingle,
                 
                 // Keyboard navigation
                 keyboard: {
-                    enabled: true,
+                    enabled: !isSingle,
                     onlyInViewport: true
                 },
                 
                 // Touch/mouse drag
                 touchEventsTarget: 'container',
-                touchRatio: 1,
+                touchRatio: isSingle ? 0 : 1,
                 touchAngle: 45,
-                simulateTouch: true,
-                
-                // Lazy loading for performance
-                lazy: {
-                    loadPrevNext: true,
-                    loadPrevNextAmount: 2
-                },
+                simulateTouch: !isSingle,
                 
                 // Accessibility
                 a11y: {
@@ -119,7 +107,7 @@ function golem_swiper_v2_init() {
                     lastSlideMessage: 'This is the last slide'
                 },
                 
-                // Smooth fade effect on edge slides (optional)
+                // Smooth slide effect
                 effect: 'slide',
                 
                 // Events
@@ -128,7 +116,28 @@ function golem_swiper_v2_init() {
                         this.el.classList.add('swiper-initialized');
                     }
                 }
-            });
+            };
+            
+            // Only add navigation/pagination/autoplay for multi-image galleries
+            if (!isSingle) {
+                options.autoplay = {
+                    delay: autoplayDelay,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true
+                };
+                options.navigation = {
+                    nextEl: el.querySelector('.swiper-button-next'),
+                    prevEl: el.querySelector('.swiper-button-prev')
+                };
+                options.pagination = {
+                    el: el.querySelector('.swiper-pagination'),
+                    clickable: true,
+                    dynamicBullets: true,
+                    dynamicMainBullets: 3
+                };
+            }
+            
+            new Swiper(el, options);
         });
     }
     
@@ -378,6 +387,19 @@ function golem_swiper_v2_styles() {
 }
 
 /* ==========================================================================
+   SINGLE IMAGE GALLERIES
+   ========================================================================== */
+.golem-instagram-gallery.golem-single-image {
+    cursor: default !important;
+}
+
+.golem-instagram-gallery.golem-single-image .swiper-button-prev,
+.golem-instagram-gallery.golem-single-image .swiper-button-next,
+.golem-instagram-gallery.golem-single-image .swiper-pagination {
+    display: none !important;
+}
+
+/* ==========================================================================
    INITIALIZATION STATE
    ========================================================================== */
 .golem-instagram-gallery:not(.swiper-initialized),
@@ -421,11 +443,13 @@ function golem_gallery_v2_shortcode($atts) {
     if (empty($atts['images'])) return '';
     
     $images = array_map('trim', explode(',', $atts['images']));
+    $images = array_filter($images); // Remove empty entries
     $autoplay = absint($atts['autoplay']);
+    $is_single = count($images) <= 1;
     
     ob_start();
     ?>
-    <div class="golem-instagram-gallery swiper" data-autoplay="<?php echo esc_attr($autoplay); ?>">
+    <div class="golem-instagram-gallery swiper<?php echo $is_single ? ' golem-single-image' : ''; ?>" data-autoplay="<?php echo esc_attr($autoplay); ?>" data-slides="<?php echo count($images); ?>">
         <div class="swiper-wrapper">
             <?php foreach ($images as $img): ?>
             <div class="swiper-slide">
@@ -433,9 +457,11 @@ function golem_gallery_v2_shortcode($atts) {
             </div>
             <?php endforeach; ?>
         </div>
+        <?php if (!$is_single): ?>
         <div class="swiper-pagination"></div>
         <div class="swiper-button-prev"></div>
         <div class="swiper-button-next"></div>
+        <?php endif; ?>
     </div>
     <?php
     return ob_get_clean();
