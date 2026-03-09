@@ -115,6 +115,12 @@ add_action('wp_head', function() {
     .aux-ajax-type-scroll .aux-load-more.aux-no-more::after {
         display: none;
     }
+    /* ===== HIDE DATES & UNCATEGORIZED FROM FRONTEND ===== */
+    .entry-info .entry-date { display: none !important; }
+    .elementor-icon-list-item[itemprop= datePublished], li.elementor-icon-list-item:has(time) { display: none !important; }
+    .elementor-post-info__item--type-time { display: none !important; }
+    .elementor-post-info__terms-list-item, .entry-tax, .entry-info .entry-tax { display: none !important; }
+    .entry-info .meta-sep { display: none !important; }
     </style>
     <?php
 }, 1);
