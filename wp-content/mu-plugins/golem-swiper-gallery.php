@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Golem Instagram Gallery (Swiper) v2.2
- * Description: Modern Instagram-style gallery with Swiper.js + video Reel support. Arrows inside, touch, autoplay. Single-image galleries handled cleanly.
- * Version: 2.2.0
+ * Plugin Name: Golem Instagram Gallery (Swiper) v2.3
+ * Description: Modern Instagram-style gallery with Swiper.js + video Reel support. WebP auto-switch, descriptive alt tags, lazy loading.
+ * Version: 2.3.0
  * Author: Golem Roofing
  * 
  * Based on official Swiper.js v11 documentation
@@ -559,7 +559,7 @@ function golem_gallery_v2_shortcode($atts) {
         $poster = '';
         if (!empty($atts['images'])) {
             $images = array_map('trim', explode(',', $atts['images']));
-            $poster = esc_url($images[0]);
+            $poster = esc_url(golem_gallery_webp_url($images[0]));
         }
         
         ob_start();
@@ -587,21 +587,32 @@ function golem_gallery_v2_shortcode($atts) {
         return ob_get_clean();
     }
     
-    // IMAGE GALLERY MODE (existing behavior)
+    // IMAGE GALLERY MODE
     if (empty($atts['images'])) return '';
     
     $images = array_map('trim', explode(',', $atts['images']));
     $images = array_filter($images); // Remove empty entries
     $autoplay = absint($atts['autoplay']);
     $is_single = count($images) <= 1;
+    $total = count($images);
+    
+    // Generate descriptive alt text from current post title
+    $post_title = '';
+    $current_post = get_post();
+    if ($current_post) {
+        $post_title = sanitize_text_field($current_post->post_title);
+    }
+    if (empty($post_title)) {
+        $post_title = 'Golem Roofing project';
+    }
     
     ob_start();
     ?>
-    <div class="golem-instagram-gallery swiper<?php echo $is_single ? ' golem-single-image' : ''; ?>" data-autoplay="<?php echo esc_attr($autoplay); ?>" data-slides="<?php echo count($images); ?>">
+    <div class="golem-instagram-gallery swiper<?php echo $is_single ? ' golem-single-image' : ''; ?>" data-autoplay="<?php echo esc_attr($autoplay); ?>" data-slides="<?php echo $total; ?>">
         <div class="swiper-wrapper">
-            <?php foreach ($images as $img): ?>
+            <?php $slide_num = 0; foreach ($images as $img): $slide_num++; ?>
             <div class="swiper-slide">
-                <img src="<?php echo esc_url($img); ?>" alt="Golem Roofing project" loading="lazy">
+                <img src="<?php echo esc_url(golem_gallery_webp_url($img)); ?>" alt="<?php echo esc_attr($post_title . ' — photo ' . $slide_num . ' of ' . $total); ?>" loading="lazy">
             </div>
             <?php endforeach; ?>
         </div>
@@ -613,6 +624,44 @@ function golem_gallery_v2_shortcode($atts) {
     </div>
     <?php
     return ob_get_clean();
+}
+
+/**
+ * Convert image URL to WebP if the WebP version exists on disk.
+ * Falls back to original URL if no WebP available.
+ */
+function golem_gallery_webp_url($url) {
+    // Only convert jpg/jpeg/png
+    if (!preg_match('/\.(jpe?g|png)$/i', $url)) {
+        return $url;
+    }
+    
+    $webp_url = preg_replace('/\.(jpe?g|png)$/i', '.webp', $url);
+    
+    // Convert URL to server path to check file existence
+    $upload_dir = wp_get_upload_dir();
+    $base_url = $upload_dir['baseurl'];
+    $base_path = $upload_dir['basedir'];
+    
+    // Check if the URL belongs to our uploads
+    if (strpos($url, $base_url) === 0) {
+        $relative = str_replace($base_url, '', $url);
+        $webp_path = $base_path . preg_replace('/\.(jpe?g|png)$/i', '.webp', $relative);
+        
+        if (file_exists($webp_path)) {
+            return $webp_url;
+        }
+    }
+    
+    // For gallery/ subfolder — check directly
+    if (strpos($url, '/uploads/gallery/') !== false) {
+        $gallery_path = $base_path . '/gallery/' . basename(preg_replace('/\.(jpe?g|png)$/i', '.webp', $url));
+        if (file_exists($gallery_path)) {
+            return $webp_url;
+        }
+    }
+    
+    return $url; // fallback to original
 }
 
 /**

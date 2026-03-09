@@ -1,71 +1,68 @@
 <?php
 /**
- * Auto-generate ALT tags for images without ALT
+ * Auto-generate contextual ALT tags for images.
+ * v2.0 — Uses parent post title as context instead of filename.
  * Golem Roofing SEO Optimization
  */
 
-// Run only on admin_init to update existing images
-add_action("admin_init", function() {
-    // Only run once per day
-    if (get_transient("golem_alt_tags_updated")) {
-        return;
-    }
-    
-    global $wpdb;
-    
-    // Find images without ALT text
-    $images = $wpdb->get_results("
-        SELECT p.ID, p.post_title, p.guid
-        FROM {$wpdb->posts} p
-        LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_wp_attachment_image_alt'
-        WHERE p.post_type = 'attachment'
-        AND p.post_mime_type LIKE 'image/%'
-        AND (pm.meta_value IS NULL OR pm.meta_value = '')
-        LIMIT 50
-    ");
-    
-    foreach ($images as $image) {
-        // Generate ALT from title
-        $alt = $image->post_title;
-        
-        // Clean up the title
-        $alt = str_replace(["-", "_", ".jpg", ".png", ".webp", ".gif", ".jpeg"], " ", $alt);
-        $alt = preg_replace("/[0-9]+x[0-9]+/", "", $alt); // Remove dimensions
-        $alt = preg_replace("/\s+/", " ", $alt); // Multiple spaces to one
-        $alt = trim($alt);
-        $alt = ucfirst(strtolower($alt));
-        
-        // Add Golem Roofing context for generic images
-        if (stripos($alt, "roofing") === false && stripos($alt, "roof") === false && stripos($alt, "golem") === false) {
-            $alt .= " - Golem Roofing";
-        }
-        
-        if (!empty($alt)) {
-            update_post_meta($image->ID, "_wp_attachment_image_alt", $alt);
-        }
-    }
-    
-    // Set transient to avoid running too often
-    set_transient("golem_alt_tags_updated", true, DAY_IN_SECONDS);
-});
-
-// Auto-add ALT to newly uploaded images
-add_action("add_attachment", function($post_id) {
+/**
+ * Generate a contextual alt tag for an attachment.
+ */
+function golem_generate_alt($post_id) {
     $post = get_post($post_id);
-    
-    if ($post->post_mime_type && strpos($post->post_mime_type, "image/") === 0) {
-        $existing_alt = get_post_meta($post_id, "_wp_attachment_image_alt", true);
-        
-        if (empty($existing_alt)) {
-            $alt = $post->post_title;
-            $alt = str_replace(["-", "_"], " ", $alt);
-            $alt = preg_replace("/\.[^.]+$/", "", $alt); // Remove extension
-            $alt = trim($alt);
-            $alt = ucfirst(strtolower($alt));
-            
-            if (!empty($alt)) {
-                update_post_meta($post_id, "_wp_attachment_image_alt", $alt . " - Golem Roofing");
+    if (!$post) return '';
+
+    $alt = '';
+
+    // 1. Try parent post title
+    if ($post->post_parent > 0) {
+        $parent = get_post($post->post_parent);
+        if ($parent && !empty($parent->post_title)) {
+            $alt = wp_strip_all_tags($parent->post_title);
+        }
+    }
+
+    // 2. Check if filename is readable (not a hash)
+    if (empty($alt)) {
+        $file = get_post_meta($post_id, '_wp_attached_file', true);
+        $name = pathinfo(basename($file ?: ''), PATHINFO_FILENAME);
+        $is_hash = preg_match('/^[0-9a-f]{16,}$/i', $name)
+            || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-/', $name);
+
+        if (!$is_hash && strlen($name) > 3) {
+            $clean = str_replace(['-', '_'], ' ', $name);
+            $clean = preg_replace('/\d+x\d+/', '', $clean);
+            $clean = preg_replace('/\b(scaled|e\d+)\b/i', '', $clean);
+            $clean = preg_replace('/\s+/', ' ', trim($clean));
+            if (strlen($clean) > 3) {
+                $alt = ucfirst(strtolower($clean));
             }
         }
+    }
+
+    // 3. Fallback
+    if (empty($alt)) {
+        $alt = 'Golem Roofing — professional roofing services in Los Angeles';
+    }
+
+    // Add branding if missing
+    if (stripos($alt, 'roof') === false && stripos($alt, 'golem') === false) {
+        $alt .= ' — Golem Roofing';
+    }
+
+    return trim($alt);
+}
+
+// Auto-add ALT to newly uploaded images
+add_action('add_attachment', function($post_id) {
+    $post = get_post($post_id);
+    if (!$post || strpos($post->post_mime_type, 'image/') !== 0) return;
+
+    $existing = get_post_meta($post_id, '_wp_attachment_image_alt', true);
+    if (!empty($existing)) return;
+
+    $alt = golem_generate_alt($post_id);
+    if (!empty($alt)) {
+        update_post_meta($post_id, '_wp_attachment_image_alt', $alt);
     }
 });
