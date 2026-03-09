@@ -90,6 +90,31 @@ add_action('wp_head', function() {
     .post.column-entry:hover .entry-media .aux-media-frame img {
         transform: scale(1.03) !important;
     }
+
+    /* ===== INFINITE SCROLL: hide LOAD MORE, show loading spinner ===== */
+    .aux-ajax-type-scroll .aux-load-more .aux-label-text {
+        display: none !important;
+    }
+    .aux-ajax-type-scroll .aux-load-more {
+        padding: 2rem 0;
+    }
+    .aux-ajax-type-scroll .aux-load-more::after {
+        content: "";
+        display: block;
+        width: 32px;
+        height: 32px;
+        margin: 0 auto;
+        border: 3px solid #e5e5e5;
+        border-top-color: #0D47A1;
+        border-radius: 50%;
+        animation: golem-spin 0.8s linear infinite;
+    }
+    @keyframes golem-spin {
+        to { transform: rotate(360deg); }
+    }
+    .aux-ajax-type-scroll .aux-load-more.aux-no-more::after {
+        display: none;
+    }
     </style>
     <?php
 }, 1);
