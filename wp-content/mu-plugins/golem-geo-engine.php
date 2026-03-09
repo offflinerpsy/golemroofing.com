@@ -1,0 +1,662 @@
+<?php
+/**
+ * Plugin Name: Golem GEO Engine
+ * Description: GEO optimization — llms.txt, AI-friendly robots.txt, enhanced Schema.org, BreadcrumbList
+ * Version: 1.0.0
+ * Author: Golem Roofing Dev Team
+ */
+
+if (!defined('ABSPATH')) exit;
+
+// ═══════════════════════════════════════════════════════════════
+// SERVICE AREAS CONFIGURATION
+// ═══════════════════════════════════════════════════════════════
+
+function golem_geo_get_service_areas(): array {
+    return [
+        'seal-beach' => [
+            'city'          => 'Seal Beach',
+            'state'         => 'CA',
+            'zips'          => ['90740'],
+            'lat'           => 33.7414,
+            'lng'           => -118.1048,
+            'slug'          => 'roofing-seal-beach-ca',
+            'neighborhoods' => ['Old Ranch', 'College Park East', 'College Park West', 'The Hill'],
+            'landmarks'     => ['Seal Beach Pier', 'Pacific Coast Highway', 'Seal Beach National Wildlife Refuge'],
+        ],
+        'long-beach' => [
+            'city'          => 'Long Beach',
+            'state'         => 'CA',
+            'zips'          => ['90803', '90808', '90807'],
+            'lat'           => 33.7701,
+            'lng'           => -118.1937,
+            'slug'          => 'roofing-long-beach-ca',
+            'neighborhoods' => ['Belmont Shore', 'Belmont Heights', 'Naples', 'Alamitos Heights', 'Cal Heights', 'Bixby Knolls', 'Los Cerritos', 'Wrigley'],
+            'landmarks'     => ['Long Beach Airport', 'CSULB', 'Belmont Pier', 'Shoreline Village'],
+        ],
+        'los-alamitos' => [
+            'city'          => 'Los Alamitos',
+            'state'         => 'CA',
+            'zips'          => ['90720'],
+            'lat'           => 33.8031,
+            'lng'           => -118.0726,
+            'slug'          => 'roofing-los-alamitos-rossmoor-ca',
+            'neighborhoods' => ['Rossmoor', 'Rossmoor Center'],
+            'landmarks'     => ['Rush Park', 'Shops at Rossmoor', 'Coyote Creek Trail'],
+        ],
+        'manhattan-beach' => [
+            'city'          => 'Manhattan Beach',
+            'state'         => 'CA',
+            'zips'          => ['90266'],
+            'lat'           => 33.8847,
+            'lng'           => -118.4109,
+            'slug'          => 'roofing-manhattan-beach-ca',
+            'neighborhoods' => ['Sand Section', 'Tree Section', 'Hill Section', 'East Manhattan Beach', 'Manhattan Village'],
+            'landmarks'     => ['Manhattan Beach Pier', 'The Strand', 'Manhattan Beach Boulevard'],
+        ],
+        'hermosa-beach' => [
+            'city'          => 'Hermosa Beach',
+            'state'         => 'CA',
+            'zips'          => ['90254'],
+            'lat'           => 33.8622,
+            'lng'           => -118.3995,
+            'slug'          => 'roofing-hermosa-beach-ca',
+            'neighborhoods' => ['Upper Hermosa', 'Lower Hermosa', 'Hermosa Valley'],
+            'landmarks'     => ['Hermosa Beach Pier', 'Pier Avenue', 'The Strand', 'Greenbelt'],
+        ],
+        'redondo-beach' => [
+            'city'          => 'Redondo Beach',
+            'state'         => 'CA',
+            'zips'          => ['90277', '90278'],
+            'lat'           => 33.8492,
+            'lng'           => -118.3884,
+            'slug'          => 'roofing-redondo-beach-ca',
+            'neighborhoods' => ['North Redondo', 'South Redondo', 'Riviera Village'],
+            'landmarks'     => ['King Harbor', 'Redondo Beach Pier', 'Aviation Boulevard'],
+        ],
+        'palos-verdes' => [
+            'city'          => 'Palos Verdes Estates',
+            'state'         => 'CA',
+            'zips'          => ['90274'],
+            'lat'           => 33.7834,
+            'lng'           => -118.3906,
+            'slug'          => 'roofing-palos-verdes-ca',
+            'neighborhoods' => ['Lunada Bay', 'Malaga Cove', 'Valmonte', 'Rolling Hills', 'Rolling Hills Estates'],
+            'landmarks'     => ['Trump National Golf Club', 'Malaga Cove Plaza', 'Palos Verdes Drive'],
+        ],
+        'rancho-palos-verdes' => [
+            'city'          => 'Rancho Palos Verdes',
+            'state'         => 'CA',
+            'zips'          => ['90275'],
+            'lat'           => 33.7444,
+            'lng'           => -118.3870,
+            'slug'          => 'roofing-rancho-palos-verdes-ca',
+            'neighborhoods' => ['Portuguese Bend', 'Eastview', 'Miraleste'],
+            'landmarks'     => ['Point Vicente Lighthouse', 'Wayfarers Chapel', 'Terranea Resort', 'Abalone Cove'],
+        ],
+    ];
+}
+
+function golem_geo_get_services(): array {
+    return [
+        ['name' => 'Roof Installation',            'slug' => 'roof-installation',            'category' => 'installation'],
+        ['name' => 'Flat Roof Installation',        'slug' => 'flat-roof-installation',       'category' => 'installation'],
+        ['name' => 'Tile Roof Installation',        'slug' => 'tile-roof-installation',       'category' => 'installation'],
+        ['name' => 'Shingle Roof Installation',     'slug' => 'shingle-roof-installation',    'category' => 'installation'],
+        ['name' => 'Roof Replacement',              'slug' => 'roof-replacement',             'category' => 'replacement'],
+        ['name' => 'Flat Roof Replacement',         'slug' => 'flat-roof-replacement',        'category' => 'replacement'],
+        ['name' => 'Tile Roof Replacement',         'slug' => 'tile-roof-replacement',        'category' => 'replacement'],
+        ['name' => 'Shingle Roof Replacement',      'slug' => 'shingle-roof-replacement',     'category' => 'replacement'],
+        ['name' => 'Clay Tile Roof Replacement',    'slug' => 'clay-tile-roof-replacement',   'category' => 'replacement'],
+        ['name' => 'Concrete Tile Roof Replacement', 'slug' => 'concrete-tile-roof-replacement', 'category' => 'replacement'],
+        ['name' => 'Roof Repair',                   'slug' => 'roof-repair',                  'category' => 'repair'],
+        ['name' => 'Flat Roof Repair',              'slug' => 'flat-roof-repair',             'category' => 'repair'],
+        ['name' => 'Tile Roof Repair',              'slug' => 'tile-roof-repair',             'category' => 'repair'],
+        ['name' => 'Shingle Roof Repair',           'slug' => 'shingle-roof-repair',          'category' => 'repair'],
+        ['name' => 'Silicone Roof Restoration',     'slug' => 'silicone-roof-restoration',    'category' => 'special'],
+    ];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 1. llms.txt ENDPOINT
+// ═══════════════════════════════════════════════════════════════
+
+add_action('init', 'golem_geo_llms_rewrite');
+function golem_geo_llms_rewrite(): void {
+    add_rewrite_rule('^llms\.txt$', 'index.php?golem_llms=short', 'top');
+    add_rewrite_rule('^llms-full\.txt$', 'index.php?golem_llms=full', 'top');
+}
+
+add_filter('query_vars', function (array $vars): array {
+    $vars[] = 'golem_llms';
+    return $vars;
+});
+
+add_action('template_redirect', 'golem_geo_serve_llms');
+function golem_geo_serve_llms(): void {
+    $mode = get_query_var('golem_llms');
+    if (!$mode) return;
+
+    header('Content-Type: text/plain; charset=utf-8');
+    header('X-Robots-Tag: noindex');
+
+    $areas    = golem_geo_get_service_areas();
+    $services = golem_geo_get_services();
+    $site_url = 'https://golemroofing.com';
+
+    $cities_list = implode(', ', array_map(fn($a) => $a['city'], $areas));
+
+    // --- SHORT VERSION ---
+    $out = "# Golem Roofing — Professional Roofing Contractor in Los Angeles & Orange County\n\n";
+    $out .= "> Licensed, bonded, and insured roofing company serving {$cities_list}, and surrounding areas in California. Roof installation, replacement, repair, and silicone restoration with 15-year workmanship warranty.\n\n";
+
+    $out .= "## Company Facts\n\n";
+    $out .= "| Fact | Value |\n";
+    $out .= "|------|-------|\n";
+    $out .= "| Founded | 2018 |\n";
+    $out .= "| Rating | 5.0 / 5 (47 reviews) |\n";
+    $out .= "| Workmanship Warranty | 15 years |\n";
+    $out .= "| Manufacturer Warranty | 20+ years |\n";
+    $out .= "| Insurance | \$1M liability + \$25K bond |\n";
+    $out .= "| Third-Party Guarantee | \$250K |\n";
+    $out .= "| Starting Price | \$9,900 (full roof) |\n";
+    $out .= "| Financing | From \$149/month via Acorn Finance |\n";
+    $out .= "| License | California CSLB Licensed |\n\n";
+
+    $out .= "## Services\n\n";
+    foreach ($services as $s) {
+        $out .= "- [{$s['name']}]({$site_url}/{$s['slug']}/)\n";
+    }
+
+    $out .= "\n## Service Areas\n\n";
+    foreach ($areas as $a) {
+        $zips = implode('/', $a['zips']);
+        $out .= "- [{$a['city']}, CA {$zips}]({$site_url}/{$a['slug']}/)\n";
+    }
+
+    $out .= "\n## Contact\n\n";
+    $out .= "- Phone: (562) 991-8165\n";
+    $out .= "- Email: Golemroofing@gmail.com\n";
+    $out .= "- Website: {$site_url}\n";
+    $out .= "- Hours: Mon-Fri 7am-7pm, Sat 8am-5pm\n\n";
+
+    $out .= "## Key Pages\n\n";
+    $out .= "- [Homepage]({$site_url}/): Main landing page with service overview\n";
+    $out .= "- [Blog]({$site_url}/blog/): 56+ articles on roofing tips, projects, and guides\n";
+    $out .= "- [Free Roof Inspection]({$site_url}/roof-inspection-request-form/): Request a free inspection\n";
+
+    if ($mode === 'full') {
+        $out .= "\n---\n\n";
+        $out .= "## Detailed Service Descriptions\n\n";
+
+        $descriptions = [
+            'Roof Installation'             => 'Complete new roof installation using premium materials (GAF Timberline HDZ, TPO, tile, composite). Includes tear-off of old roofing, deck inspection, underlayment, and new roof system.',
+            'Flat Roof Installation'         => 'TPO and modified bitumen flat roof systems for commercial and residential buildings. Energy-efficient, durable, and backed by manufacturer warranty.',
+            'Tile Roof Installation'         => 'Clay and concrete tile installation for Mediterranean, Spanish, and modern-style homes. Underlayment systems designed for Southern California climate.',
+            'Shingle Roof Installation'      => 'Architectural and 3-tab shingle installation. GAF certified installer with access to premium color selections and extended warranties.',
+            'Roof Replacement'               => 'Full tear-off and replacement of existing roof. Includes deck repair, modern underlayment, and new roofing material installation.',
+            'Flat Roof Replacement'          => 'Removal of old torch-down, built-up, or failing flat roof systems. Replacement with TPO or silicone-coated systems.',
+            'Tile Roof Replacement'          => 'Replacement of broken, cracked, or aging tile roofs. Options include clay, concrete, and composite tiles.',
+            'Shingle Roof Replacement'       => 'Full shingle roof tear-off and replacement with GAF Timberline HDZ-RS or equivalent premium shingles.',
+            'Clay Tile Roof Replacement'     => 'Specialized clay tile replacement preserving original aesthetic. Custom color matching available.',
+            'Concrete Tile Roof Replacement' => 'Concrete tile roof replacement with modern lightweight alternatives or matching concrete tiles.',
+            'Roof Repair'                    => 'Emergency and scheduled repairs for all roof types. Leak detection, patch repair, flashing replacement, and storm damage repair.',
+            'Flat Roof Repair'               => 'Flat roof leak repair, ponding water solutions, membrane patching, and seam re-welding for TPO and modified bitumen.',
+            'Tile Roof Repair'               => 'Individual tile replacement, underlayment repair, re-pointing, and valley repair for tile roofs.',
+            'Shingle Roof Repair'            => 'Shingle replacement, wind damage repair, nail pop fixes, and flashing repairs.',
+            'Silicone Roof Restoration'      => 'No tear-off silicone coating system for existing flat roofs. Extends roof life 15-20 years at fraction of replacement cost.',
+        ];
+
+        foreach ($services as $s) {
+            $desc = $descriptions[$s['name']] ?? '';
+            $out .= "### {$s['name']}\n{$desc}\n[Learn more]({$site_url}/{$s['slug']}/)\n\n";
+        }
+
+        $out .= "## Detailed Service Areas\n\n";
+        foreach ($areas as $a) {
+            $zips   = implode(', ', $a['zips']);
+            $hoods  = implode(', ', $a['neighborhoods']);
+            $marks  = implode(', ', $a['landmarks']);
+            $out   .= "### {$a['city']}, CA (ZIP: {$zips})\n";
+            $out   .= "Neighborhoods: {$hoods}\n";
+            $out   .= "Landmarks: {$marks}\n";
+            $out   .= "[City page]({$site_url}/{$a['slug']}/)\n\n";
+        }
+
+        $out .= "## Frequently Asked Questions\n\n";
+        $faqs = golem_geo_get_homepage_faqs();
+        foreach ($faqs as $faq) {
+            $out .= "**Q: {$faq['q']}**\n{$faq['a']}\n\n";
+        }
+    }
+
+    echo $out;
+    exit;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2. ROBOTS.TXT — AI CRAWLER RULES
+// ═══════════════════════════════════════════════════════════════
+
+add_filter('robots_txt', 'golem_geo_robots_txt', 999, 2);
+function golem_geo_robots_txt(string $output, bool $public): string {
+    if (!$public) return $output;
+
+    $ai_rules  = "\n# AI Search Crawlers — Allowed\n";
+    $ai_rules .= "User-agent: GPTBot\nAllow: /\n\n";
+    $ai_rules .= "User-agent: Google-Extended\nAllow: /\n\n";
+    $ai_rules .= "User-agent: ClaudeBot\nAllow: /\n\n";
+    $ai_rules .= "User-agent: PerplexityBot\nAllow: /\n\n";
+    $ai_rules .= "User-agent: Applebot\nAllow: /\n\n";
+    $ai_rules .= "User-agent: ChatGPT-User\nAllow: /\n\n";
+
+    return $output . $ai_rules;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3. SCHEMA.ORG — COMPREHENSIVE STRUCTURED DATA
+// ═══════════════════════════════════════════════════════════════
+
+add_action('wp_head', 'golem_geo_schema_output', 1);
+function golem_geo_schema_output(): void {
+    if (is_front_page() || is_home()) {
+        golem_geo_schema_homepage();
+    } elseif (is_singular('post')) {
+        golem_geo_schema_article();
+    } elseif (is_singular('page')) {
+        golem_geo_schema_page();
+    }
+
+    // BreadcrumbList on every page
+    golem_geo_schema_breadcrumb();
+}
+
+/**
+ * Homepage Schema: RoofingContractor + ServiceAreaBusiness + FAQPage
+ */
+function golem_geo_schema_homepage(): void {
+    $areas    = golem_geo_get_service_areas();
+    $services = golem_geo_get_services();
+
+    // Build areaServed with GeoCoordinates
+    $area_served = [];
+    foreach ($areas as $a) {
+        $area_served[] = [
+            '@type'       => 'City',
+            'name'        => $a['city'] . ', CA',
+            'geo'         => [
+                '@type'     => 'GeoCoordinates',
+                'latitude'  => $a['lat'],
+                'longitude' => $a['lng'],
+            ],
+        ];
+    }
+
+    // Build service catalog
+    $offer_items = [];
+    foreach ($services as $s) {
+        $offer_items[] = [
+            '@type'        => 'Offer',
+            'itemOffered'  => [
+                '@type'       => 'Service',
+                'name'        => $s['name'],
+                'url'         => 'https://golemroofing.com/' . $s['slug'] . '/',
+                'provider'    => ['@id' => 'https://golemroofing.com/#business'],
+                'areaServed'  => array_map(fn($a) => ['@type' => 'City', 'name' => $a['city'] . ', CA'], $areas),
+            ],
+        ];
+    }
+
+    $schema = [
+        '@context'    => 'https://schema.org',
+        '@type'       => ['RoofingContractor', 'LocalBusiness'],
+        '@id'         => 'https://golemroofing.com/#business',
+        'name'        => 'Golem Roofing',
+        'alternateName' => 'Golem Roofing & Solar',
+        'description' => 'Professional roofing contractor serving Seal Beach, Long Beach, Manhattan Beach, Hermosa Beach, Redondo Beach, Palos Verdes, and surrounding areas in Los Angeles and Orange County, California. Licensed, bonded, insured. 15-year workmanship warranty.',
+        'url'         => 'https://golemroofing.com',
+        'telephone'   => '+1-562-991-8165',
+        'email'       => 'Golemroofing@gmail.com',
+        'logo'        => [
+            '@type'  => 'ImageObject',
+            'url'    => 'https://golemroofing.com/wp-content/uploads/2025/08/7bf0ac983262c3171f71cc5a0495567e.png',
+            'width'  => 798,
+            'height' => 392,
+        ],
+        'image'       => 'https://golemroofing.com/wp-content/uploads/2025/08/d45507ae-55b3-4144-b589-eac3cd6e0a67.png',
+        'address'     => [
+            '@type'            => 'PostalAddress',
+            'streetAddress'    => 'Long Beach',
+            'addressLocality'  => 'Long Beach',
+            'addressRegion'    => 'CA',
+            'postalCode'       => '90802',
+            'addressCountry'   => 'US',
+        ],
+        'geo' => [
+            '@type'     => 'GeoCoordinates',
+            'latitude'  => 33.786671,
+            'longitude' => -118.182354,
+        ],
+        'areaServed'  => $area_served,
+        'priceRange'  => '$$$',
+        'currenciesAccepted' => 'USD',
+        'paymentAccepted'    => 'Cash, Credit Card, Financing Available',
+        'openingHoursSpecification' => [
+            [
+                '@type'     => 'OpeningHoursSpecification',
+                'dayOfWeek' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+                'opens'     => '07:00',
+                'closes'    => '19:00',
+            ],
+            [
+                '@type'     => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Saturday',
+                'opens'     => '08:00',
+                'closes'    => '17:00',
+            ],
+        ],
+        'sameAs' => [
+            'https://www.instagram.com/golemroofing/',
+            'https://www.facebook.com/profile.php?id=61574735318556',
+            'https://www.yelp.com/biz/andy-s-custom-solutions-long-beach',
+        ],
+        'hasOfferCatalog' => [
+            '@type'           => 'OfferCatalog',
+            'name'            => 'Roofing Services',
+            'itemListElement' => $offer_items,
+        ],
+        'aggregateRating' => [
+            '@type'       => 'AggregateRating',
+            'ratingValue' => '5.0',
+            'bestRating'  => '5',
+            'worstRating' => '1',
+            'ratingCount' => '47',
+            'reviewCount' => '47',
+        ],
+        'slogan'       => 'Power You Can Trust',
+        'foundingDate' => '2018',
+    ];
+
+    golem_geo_emit_jsonld($schema);
+
+    // FAQPage schema — expanded
+    $faqs      = golem_geo_get_homepage_faqs();
+    $faq_items = [];
+    foreach ($faqs as $f) {
+        $faq_items[] = [
+            '@type'          => 'Question',
+            'name'           => $f['q'],
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text'  => $f['a'],
+            ],
+        ];
+    }
+
+    $faq_schema = [
+        '@context'   => 'https://schema.org',
+        '@type'      => 'FAQPage',
+        'mainEntity' => $faq_items,
+    ];
+    golem_geo_emit_jsonld($faq_schema);
+}
+
+/**
+ * Blog post Schema: Article
+ */
+function golem_geo_schema_article(): void {
+    global $post;
+    if (!$post) return;
+
+    $schema = [
+        '@context'      => 'https://schema.org',
+        '@type'         => 'Article',
+        'headline'      => get_the_title($post),
+        'url'           => get_permalink($post),
+        'datePublished' => get_the_date('c', $post),
+        'dateModified'  => get_the_modified_date('c', $post),
+        'author'        => [
+            '@type'    => 'Organization',
+            'name'     => 'Golem Roofing',
+            'url'      => 'https://golemroofing.com',
+        ],
+        'publisher'     => [
+            '@type' => 'Organization',
+            'name'  => 'Golem Roofing',
+            'logo'  => [
+                '@type' => 'ImageObject',
+                'url'   => 'https://golemroofing.com/wp-content/uploads/2025/08/7bf0ac983262c3171f71cc5a0495567e.png',
+            ],
+        ],
+        'description'   => wp_trim_words(wp_strip_all_tags($post->post_content), 30, '...'),
+        'mainEntityOfPage' => [
+            '@type' => 'WebPage',
+            '@id'   => get_permalink($post),
+        ],
+        'about' => [
+            '@type' => 'Service',
+            'name'  => 'Roofing Services',
+            'provider' => ['@id' => 'https://golemroofing.com/#business'],
+        ],
+    ];
+
+    // Add image if post has thumbnail
+    $thumb = get_the_post_thumbnail_url($post, 'full');
+    if ($thumb) {
+        $schema['image'] = $thumb;
+    }
+
+    golem_geo_emit_jsonld($schema);
+}
+
+/**
+ * Generic page Schema: WebPage (future city/service pages will match here)
+ */
+function golem_geo_schema_page(): void {
+    global $post;
+    if (!$post) return;
+
+    $slug  = $post->post_name;
+    $areas = golem_geo_get_service_areas();
+
+    // Check if this is a city landing page
+    foreach ($areas as $a) {
+        if ($slug === $a['slug']) {
+            golem_geo_schema_city_page($a);
+            return;
+        }
+    }
+
+    // Check if this is a service page
+    $services = golem_geo_get_services();
+    foreach ($services as $s) {
+        if ($slug === $s['slug']) {
+            golem_geo_schema_service_page($s);
+            return;
+        }
+    }
+}
+
+/**
+ * City landing page Schema
+ */
+function golem_geo_schema_city_page(array $area): void {
+    $schema = [
+        '@context'    => 'https://schema.org',
+        '@type'       => ['RoofingContractor', 'LocalBusiness'],
+        'name'        => 'Golem Roofing — ' . $area['city'] . ', CA',
+        'description' => "Professional roofing services in {$area['city']}, CA. Roof installation, replacement, and repair. Licensed, bonded, insured. Call (562) 991-8165.",
+        'url'         => 'https://golemroofing.com/' . $area['slug'] . '/',
+        'telephone'   => '+1-562-991-8165',
+        'parentOrganization' => ['@id' => 'https://golemroofing.com/#business'],
+        'areaServed'  => [
+            '@type' => 'City',
+            'name'  => $area['city'] . ', CA',
+            'geo'   => [
+                '@type'     => 'GeoCoordinates',
+                'latitude'  => $area['lat'],
+                'longitude' => $area['lng'],
+            ],
+        ],
+        'address' => [
+            '@type'           => 'PostalAddress',
+            'addressLocality' => $area['city'],
+            'addressRegion'   => 'CA',
+            'postalCode'      => $area['zips'][0],
+            'addressCountry'  => 'US',
+        ],
+    ];
+
+    golem_geo_emit_jsonld($schema);
+}
+
+/**
+ * Service page Schema
+ */
+function golem_geo_schema_service_page(array $service): void {
+    $areas = golem_geo_get_service_areas();
+
+    $schema = [
+        '@context'    => 'https://schema.org',
+        '@type'       => 'Service',
+        'name'        => $service['name'],
+        'url'         => 'https://golemroofing.com/' . $service['slug'] . '/',
+        'provider'    => ['@id' => 'https://golemroofing.com/#business'],
+        'areaServed'  => array_map(fn($a) => [
+            '@type' => 'City',
+            'name'  => $a['city'] . ', CA',
+        ], $areas),
+        'serviceType' => 'Roofing',
+    ];
+
+    golem_geo_emit_jsonld($schema);
+}
+
+/**
+ * BreadcrumbList Schema — all pages
+ */
+function golem_geo_schema_breadcrumb(): void {
+    if (is_front_page()) return;
+
+    $items   = [];
+    $items[] = ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://golemroofing.com/'];
+
+    if (is_singular('post')) {
+        $items[] = ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => 'https://golemroofing.com/blog/'];
+        $items[] = ['@type' => 'ListItem', 'position' => 3, 'name' => get_the_title()];
+    } elseif (is_singular('page')) {
+        global $post;
+        $slug     = $post->post_name;
+        $areas    = golem_geo_get_service_areas();
+        $services = golem_geo_get_services();
+
+        $is_city = false;
+        foreach ($areas as $a) {
+            if ($slug === $a['slug']) {
+                $items[] = ['@type' => 'ListItem', 'position' => 2, 'name' => 'Service Areas'];
+                $items[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $a['city'] . ', CA'];
+                $is_city = true;
+                break;
+            }
+        }
+        if (!$is_city) {
+            foreach ($services as $s) {
+                if ($slug === $s['slug']) {
+                    $items[] = ['@type' => 'ListItem', 'position' => 2, 'name' => 'Services'];
+                    $items[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $s['name']];
+                    $is_city = true;
+                    break;
+                }
+            }
+        }
+        if (!$is_city) {
+            $items[] = ['@type' => 'ListItem', 'position' => 2, 'name' => get_the_title()];
+        }
+    }
+
+    if (count($items) < 2) return;
+
+    $schema = [
+        '@context'        => 'https://schema.org',
+        '@type'           => 'BreadcrumbList',
+        'itemListElement' => $items,
+    ];
+    golem_geo_emit_jsonld($schema);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 4. EXPANDED FAQ DATA
+// ═══════════════════════════════════════════════════════════════
+
+function golem_geo_get_homepage_faqs(): array {
+    return [
+        [
+            'q' => 'How much does a new roof cost in Los Angeles?',
+            'a' => 'At Golem Roofing, new roof installations start from $9,900. The final price depends on roof size, material type, number of stories, and existing layers. We offer free estimates and flexible financing options starting at $149/month.',
+        ],
+        [
+            'q' => 'What areas do you serve in California?',
+            'a' => 'Golem Roofing serves Seal Beach, Long Beach, Los Alamitos, Rossmoor, Manhattan Beach, Hermosa Beach, Redondo Beach, Palos Verdes Estates, Rolling Hills Estates, and Rancho Palos Verdes. We cover both Los Angeles County and Orange County.',
+        ],
+        [
+            'q' => 'Do you offer warranties on roofing work?',
+            'a' => 'Yes. We provide a 15-year workmanship warranty, 20+ year manufacturer warranty, $25K bond, $1M liability insurance, and a $250K third-party guarantee through Directorii.',
+        ],
+        [
+            'q' => 'Do you offer financing for roof replacement?',
+            'a' => 'Yes, we offer flexible financing through Acorn Finance. Full roof replacements can be financed from $149 per month with easy approval.',
+        ],
+        [
+            'q' => 'Are you a licensed roofing contractor?',
+            'a' => 'Yes, Golem Roofing is fully licensed with the California State License Board (CSLB), carries $25K bond and $1M liability insurance.',
+        ],
+        [
+            'q' => 'How long does a roof replacement take?',
+            'a' => 'Most residential roof replacements are completed in 1-3 days depending on roof size and complexity. Flat roof projects may take 2-4 days. We start early morning and work efficiently to minimize disruption.',
+        ],
+        [
+            'q' => 'What roofing materials do you use?',
+            'a' => 'We install GAF Timberline HDZ shingles, TPO membrane for flat roofs, clay and concrete tiles, and silicone coating systems. All materials come with manufacturer warranties of 20+ years.',
+        ],
+        [
+            'q' => 'Do you handle emergency roof repairs?',
+            'a' => 'Yes, we provide emergency roof leak repair services across all our service areas. Call (562) 991-8165 for immediate assistance. We aim to respond within 24 hours for emergencies.',
+        ],
+        [
+            'q' => 'What is silicone roof restoration?',
+            'a' => 'Silicone roof restoration is a no-tear-off coating system applied over existing flat roofs. It seals leaks, reflects UV rays, and extends roof life by 15-20 years at a fraction of full replacement cost.',
+        ],
+        [
+            'q' => 'Do I need a permit for roof work in California?',
+            'a' => 'Most roof replacements in California require a building permit. As a licensed contractor, Golem Roofing handles all permit applications and inspections for you at no additional charge.',
+        ],
+        [
+            'q' => 'Can you work on roofs with solar panels?',
+            'a' => 'Yes, we regularly handle roofs with solar panels. We coordinate panel removal before roofing and reinstallation afterward, or install new solar systems on fresh roofs.',
+        ],
+        [
+            'q' => 'How do I know if I need a roof repair or full replacement?',
+            'a' => 'If your roof is under 15 years old with isolated damage, repair is usually sufficient. Roofs over 20 years or with widespread issues typically need replacement. We offer free inspections to help you decide.',
+        ],
+    ];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER
+// ═══════════════════════════════════════════════════════════════
+
+function golem_geo_emit_jsonld(array $data): void {
+    echo '<script type="application/ld+json">' .
+         wp_json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) .
+         "</script>\n";
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 5. DEACTIVATE OLD SCHEMA PLUGIN (golem-schema.php)
+// ═══════════════════════════════════════════════════════════════
+
+// Remove old schema hooks if golem-schema.php is still active
+add_action('after_setup_theme', function (): void {
+    remove_action('wp_head', 'golem_roofing_schema_markup', 1);
+    remove_action('wp_head', 'golem_roofing_faq_schema', 2);
+}, 99);

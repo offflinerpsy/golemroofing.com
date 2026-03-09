@@ -1,11 +1,10 @@
 # Optimized robots.txt for Golem Roofing
-# Updated: January 2026
+# Updated: March 2026 — GEO optimization
 
 User-agent: *
 Allow: /
 Disallow: /wp-admin/
 Disallow: /wp-includes/
-Disallow: /wp-json/
 Disallow: /?s=
 Disallow: /search/
 Disallow: /*?*
@@ -16,14 +15,14 @@ Disallow: /feed/
 Disallow: /comments/feed/
 Disallow: /xmlrpc.php
 
-# Allow CSS and JS for proper rendering
+# Allow CSS, JS, and uploads for proper rendering
 Allow: /wp-content/uploads/
 Allow: /wp-content/themes/*.css
 Allow: /wp-content/themes/*.js
 Allow: /wp-content/plugins/*.css
 Allow: /wp-content/plugins/*.js
 
-# Googlebot specific
+# Googlebot
 User-agent: Googlebot
 Allow: /
 
@@ -31,5 +30,24 @@ Allow: /
 User-agent: Googlebot-Image
 Allow: /wp-content/uploads/
 
-# Sitemap location
+# AI Search Crawlers — Explicitly Allowed
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# Sitemap
 Sitemap: https://golemroofing.com/sitemap_index.xml
