@@ -16,14 +16,15 @@ golemroofing.com/
 │   └── deploy.yml              # Auto-deploy on push to main
 ├── wp-content/
 │   └── mu-plugins/             # Must-Use plugins (auto-loaded by WP)
-│       ├── golem-schema.php           # Schema.org structured data (LocalBusiness, FAQ)
+│       ├── golem-geo-engine.php       # 🆕 GEO engine: llms.txt, Schema.org, robots.txt AI rules
+│       ├── golem-schema.php           # Schema.org (LEGACY — hooks деактивированы geo-engine)
 │       ├── golem-swiper-gallery.php   # Swiper.js gallery + video Reel player v2.2
 │       ├── golem-blog-fixes.php       # Blog thumbnails, author hiding, image fixes v5.0
 │       ├── golem-blog-styles.php      # Blog post content styling v2.0
 │       └── auto-alt-tags.php          # SEO image ALT generator
 ├── snippets/                   # Code Snippets (stored in DB, backup copy here)
 │   └── elementor-telegram.php  # Elementor Forms → Telegram notifications
-├── robots.txt                  # Search engine directives + sitemap
+├── robots.txt                  # Search engine directives + AI crawler rules
 └── README.md
 ```
 
@@ -59,13 +60,41 @@ Professional blog post content styling:
 - Tips boxes, best-for badges
 - Full responsive breakpoints
 
-### `golem-schema.php`
-Schema.org structured data (JSON-LD):
-- **LocalBusiness + RoofingContractor** with NAP, geo, hours, services
-- **OfferCatalog**: roof installation, repair, solar, gutters
-- **AggregateRating**: 5.0 / 47 reviews
-- **FAQPage**: 5 common questions with answers
-- **areaServed**: LA, Long Beach, Orange County, Anaheim, Irvine, Santa Ana, Huntington Beach, Torrance
+### `golem-geo-engine.php` — v1.0.0 🆕
+GEO (Generative Engine Optimization) — оптимизация сайта для AI-поисковиков:
+
+**llms.txt — файлы для AI-краулеров:**
+- `/llms.txt` — краткая версия (~50 строк): компания, услуги, города, контакты
+- `/llms-full.txt` — полная версия (~200 строк): описания услуг, районы, FAQ
+- AI-боты (ChatGPT, Perplexity, Claude) проверяют этот файл как первый источник информации
+
+**Schema.org — расширенная разметка:**
+- **Главная:** RoofingContractor + 8 городов с GPS-координатами + 15 услуг + 12 FAQ
+- **Блог-посты:** Article schema (author, datePublished, dateModified) — автоматически на все 56+ постов
+- **Городские страницы:** LocalBusiness + город-специфичные GeoCoordinates (активируется по slug)
+- **Сервисные страницы:** Service schema + areaServed (активируется по slug)
+- **Все страницы:** BreadcrumbList (хлебные крошки)
+- Автоматически деактивирует старые hooks из golem-schema.php
+
+**robots.txt — правила для AI-ботов:**
+- WordPress filter добавляет Allow для GPTBot, ClaudeBot, PerplexityBot, Google-Extended, ChatGPT-User, Applebot
+- (Основной robots.txt — статический файл, фильтр работает как fallback)
+
+**Конфигурация сервисных зон (8 городов):**
+- Seal Beach (90740), Long Beach (90803/90808/90807), Los Alamitos/Rossmoor (90720)
+- Manhattan Beach (90266), Hermosa Beach (90254), Redondo Beach (90277/90278)
+- Palos Verdes Estates/Rolling Hills Estates (90274), Rancho Palos Verdes (90275)
+
+**Целевые услуги (15):**
+- Installation: Roof / Flat / Tile / Shingle
+- Replacement: Roof / Flat / Tile / Shingle / Clay Tile / Concrete Tile
+- Repair: Roof / Flat / Tile / Shingle
+- Special: Silicone Roof Restoration
+
+### `golem-schema.php` ⚠️ LEGACY
+Schema.org structured data (JSON-LD) — **hooks деактивированы golem-geo-engine.php:**
+- Файл остаётся как backup, но его функции `golem_roofing_schema_markup` и `golem_roofing_faq_schema` отключены
+- Вся Schema теперь генерируется через golem-geo-engine.php
 
 ### `auto-alt-tags.php`
 Automatic ALT text for images:
@@ -111,7 +140,12 @@ Elementor form submissions → Telegram:
 ## 📝 Changelog
 
 ### 2026-03-09
-- 🔄 Sync verification: server, GitHub, and local repo confirmed identical
+- � **GEO Engine v1.0** — golem-geo-engine.php:
+  - `/llms.txt` и `/llms-full.txt` — файлы для AI-краулеров (ChatGPT, Perplexity, Claude)
+  - Schema.org расширена: 8 городов с GPS, 15 услуг, 12 FAQ, Article на всех постах, BreadcrumbList
+  - robots.txt: убрана блокировка `/wp-json/`, добавлены Allow для GPTBot, ClaudeBot, PerplexityBot, Google-Extended, ChatGPT-User, Applebot
+  - Старый golem-schema.php деактивирован автоматически
+- �🔄 Sync verification: server, GitHub, and local repo confirmed identical
 - 📝 README updated with full project documentation
 
 ### 2026-02-17
