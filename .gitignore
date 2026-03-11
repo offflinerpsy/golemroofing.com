@@ -29,3 +29,9 @@ Thumbs.db
 # Debug
 debug.log
 error_log
+
+# One-time fix/diagnostic scripts
+_diag*.php
+_fix*.php
+fix-*.php
+!wp-content/plugins/**/fix-*.php

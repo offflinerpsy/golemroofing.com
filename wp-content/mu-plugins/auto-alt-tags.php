@@ -1,7 +1,7 @@
 <?php
 /**
  * Auto-generate contextual ALT tags for images.
- * v2.0 — Uses parent post title as context instead of filename.
+ * v2.1 — Detects Instagram shortcode filenames in addition to hex hashes.
  * Golem Roofing SEO Optimization
  */
 
@@ -27,7 +27,8 @@ function golem_generate_alt($post_id) {
         $file = get_post_meta($post_id, '_wp_attached_file', true);
         $name = pathinfo(basename($file ?: ''), PATHINFO_FILENAME);
         $is_hash = preg_match('/^[0-9a-f]{16,}$/i', $name)
-            || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-/', $name);
+            || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-/', $name)
+            || preg_match('/^[A-Za-z][A-Za-z0-9]{7,14}[_-]\d+$/', $name);
 
         if (!$is_hash && strlen($name) > 3) {
             $clean = str_replace(['-', '_'], ' ', $name);

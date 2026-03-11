@@ -81,7 +81,7 @@ function golem_roofing_schema_markup() {
         "sameAs" => [
             "https://www.instagram.com/golemroofing/",
             "https://www.facebook.com/profile.php?id=61574735318556",
-            "https://www.yelp.com/biz/andy-s-custom-solutions-long-beach"
+            "https://www.yelp.com/biz/golem-roofing-long-beach"
         ],
         "hasOfferCatalog" => [
             "@type" => "OfferCatalog",
