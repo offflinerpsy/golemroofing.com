@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Golem GEO Engine
- * Description: GEO optimization — llms.txt, AI-friendly robots.txt, enhanced Schema.org, BreadcrumbList, city landing pages, About Us page, footer branding
- * Version: 1.2.1
+ * Description: GEO optimization — llms.txt, AI-friendly robots.txt, enhanced Schema.org, BreadcrumbList, city landing pages, service pages, About Us page, footer branding
+ * Version: 1.3.0
  * Author: Golem Roofing Dev Team
  */
 
@@ -511,15 +511,17 @@ function golem_geo_schema_city_page(array $area): void {
 }
 
 /**
- * Service page Schema
+ * Service page Schema: Service + FAQPage
  */
 function golem_geo_schema_service_page(array $service): void {
     $areas = golem_geo_get_service_areas();
+    $descs = golem_geo_get_service_descriptions();
 
     $schema = [
         '@context'    => 'https://schema.org',
         '@type'       => 'Service',
         'name'        => $service['name'],
+        'description' => $descs[$service['name']] ?? '',
         'url'         => 'https://golemroofing.com/' . $service['slug'] . '/',
         'provider'    => ['@id' => 'https://golemroofing.com/#business'],
         'areaServed'  => array_map(fn($a) => [
@@ -530,6 +532,25 @@ function golem_geo_schema_service_page(array $service): void {
     ];
 
     golem_geo_emit_jsonld($schema);
+
+    // FAQPage for this service category
+    $faqs = golem_geo_get_service_faqs($service['category']);
+    $faq_items = [];
+    foreach ($faqs as $f) {
+        $faq_items[] = [
+            '@type'          => 'Question',
+            'name'           => $f['q'],
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text'  => $f['a'],
+            ],
+        ];
+    }
+    golem_geo_emit_jsonld([
+        '@context'   => 'https://schema.org',
+        '@type'      => 'FAQPage',
+        'mainEntity' => $faq_items,
+    ]);
 }
 
 /**
@@ -649,6 +670,64 @@ function golem_geo_emit_jsonld(array $data): void {
     echo '<script type="application/ld+json">' .
          wp_json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) .
          "</script>\n";
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 4b. SERVICE DATA HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+function golem_geo_get_service_descriptions(): array {
+    return [
+        'Roof Installation'             => 'Complete new roof installation using premium materials (GAF Timberline HDZ, TPO, tile, composite). Includes tear-off of old roofing, deck inspection, underlayment, and new roof system.',
+        'Flat Roof Installation'         => 'TPO and modified bitumen flat roof systems for commercial and residential buildings. Energy-efficient, durable, and backed by manufacturer warranty.',
+        'Tile Roof Installation'         => 'Clay and concrete tile installation for Mediterranean, Spanish, and modern-style homes. Underlayment systems designed for Southern California climate.',
+        'Shingle Roof Installation'      => 'Architectural and 3-tab shingle installation. GAF certified installer with access to premium color selections and extended warranties.',
+        'Roof Replacement'               => 'Full tear-off and replacement of existing roof. Includes deck repair, modern underlayment, and new roofing material installation.',
+        'Flat Roof Replacement'          => 'Removal of old torch-down, built-up, or failing flat roof systems. Replacement with TPO or silicone-coated systems.',
+        'Tile Roof Replacement'          => 'Replacement of broken, cracked, or aging tile roofs. Options include clay, concrete, and composite tiles.',
+        'Shingle Roof Replacement'       => 'Full shingle roof tear-off and replacement with GAF Timberline HDZ-RS or equivalent premium shingles.',
+        'Clay Tile Roof Replacement'     => 'Specialized clay tile replacement preserving original aesthetic. Custom color matching available.',
+        'Concrete Tile Roof Replacement' => 'Concrete tile roof replacement with modern lightweight alternatives or matching concrete tiles.',
+        'Roof Repair'                    => 'Emergency and scheduled repairs for all roof types. Leak detection, patch repair, flashing replacement, and storm damage repair.',
+        'Flat Roof Repair'               => 'Flat roof leak repair, ponding water solutions, membrane patching, and seam re-welding for TPO and modified bitumen.',
+        'Tile Roof Repair'               => 'Individual tile replacement, underlayment repair, re-pointing, and valley repair for tile roofs.',
+        'Shingle Roof Repair'            => 'Shingle replacement, wind damage repair, nail pop fixes, and flashing repairs.',
+        'Silicone Roof Restoration'      => 'No tear-off silicone coating system for existing flat roofs. Extends roof life 15-20 years at fraction of replacement cost.',
+    ];
+}
+
+function golem_geo_get_service_faqs(string $category): array {
+    $all = [
+        'installation' => [
+            ['q' => 'How long does a new roof installation take?', 'a' => 'Most residential roof installations take 1-3 days depending on roof size, complexity, and weather conditions. Flat roof projects may take 2-4 days. Golem Roofing works efficiently to minimize disruption to your daily life.'],
+            ['q' => 'What roofing materials does Golem Roofing install?', 'a' => 'We install GAF Timberline HDZ architectural shingles, TPO membrane for flat roofs, clay and concrete tiles, and composite materials. All materials come with 20+ year manufacturer warranties.'],
+            ['q' => 'Do I need a permit for roof installation in California?', 'a' => 'Yes, most new roof installations in California require a building permit. As a CSLB-licensed contractor, Golem Roofing handles all permits and inspections at no additional charge.'],
+            ['q' => 'How much does a new roof cost in Los Angeles?', 'a' => 'New roof installations start from $9,900 depending on roof size, material, number of stories, and existing conditions. We offer free estimates and financing from $149/month through Acorn Finance.'],
+            ['q' => 'What warranty do you offer on new roof installations?', 'a' => 'Every Golem Roofing installation comes with a 15-year workmanship warranty, 20+ year manufacturer warranty, $1M liability insurance, $25K bond, and a $250K third-party guarantee through Directorii.'],
+        ],
+        'replacement' => [
+            ['q' => 'How do I know if I need a roof replacement?', 'a' => 'Signs you need replacement include: roof over 20 years old, widespread shingle damage, multiple leaks, sagging, daylight through roof boards, or excessive granule loss. Golem Roofing offers free inspections to help you decide.'],
+            ['q' => 'What is included in a full roof replacement?', 'a' => 'Our roof replacement includes complete tear-off of old materials, deck inspection and repair, new underlayment, drip edge and flashing, new roofing material installation, and full cleanup with debris hauling.'],
+            ['q' => 'How long does a roof replacement take?', 'a' => 'Most residential roof replacements are completed in 1-3 days. Complex projects with structural repairs may take 3-5 days. We start early morning and work efficiently.'],
+            ['q' => 'Can I stay in my home during roof replacement?', 'a' => 'Yes, you can stay home during roof replacement. There will be noise and vibration during work hours (typically 7am-5pm). We take precautions to protect your property and landscaping.'],
+            ['q' => 'What happens to my old roofing materials?', 'a' => 'Golem Roofing handles complete removal and disposal of all old roofing materials. We use dedicated dumpsters and leave your property clean. Disposal fees are included in our quote.'],
+        ],
+        'repair' => [
+            ['q' => 'How much does a roof repair cost?', 'a' => 'Roof repairs vary based on damage type and extent. Minor repairs start from $350-$800, while major repairs can range from $1,500-$4,000. We provide detailed estimates after free inspection.'],
+            ['q' => 'Do you offer emergency roof repair?', 'a' => 'Yes, Golem Roofing provides emergency roof leak repair across all our service areas. Call (562) 991-8165 for immediate assistance. We respond within 24 hours for emergencies.'],
+            ['q' => 'Can you repair any type of roof?', 'a' => 'Yes, our team repairs all roof types: asphalt shingles, flat/TPO/modified bitumen, clay tiles, concrete tiles, and metal roofs. We carry materials for most common repairs.'],
+            ['q' => 'How long does a roof repair last?', 'a' => 'Quality repairs typically last 5-15 years depending on the original roof condition and repair type. If your roof needs frequent repairs, replacement may be more cost-effective long-term.'],
+            ['q' => 'Will my homeowner insurance cover roof repairs?', 'a' => 'Insurance typically covers repairs for sudden damage (storms, fallen trees) but not wear and tear. Golem Roofing can help document damage for insurance claims and work directly with your adjuster.'],
+        ],
+        'special' => [
+            ['q' => 'What is silicone roof restoration?', 'a' => 'Silicone roof restoration applies a durable silicone coating over your existing flat roof without tear-off. It seals leaks, reflects UV rays, and extends roof life by 15-20 years at a fraction of replacement cost.'],
+            ['q' => 'How long does silicone roof coating last?', 'a' => 'A properly applied silicone roof coating lasts 15-20 years with minimal maintenance. It can be recoated to extend life further without ever needing full tear-off.'],
+            ['q' => 'Is silicone restoration cheaper than full replacement?', 'a' => 'Yes, silicone restoration typically costs 40-60% less than full roof replacement. Since there is no tear-off, labor and disposal costs are dramatically reduced.'],
+            ['q' => 'What types of roofs can get silicone restoration?', 'a' => 'Silicone restoration is ideal for flat and low-slope commercial roofs with TPO, EPDM, modified bitumen, or built-up roofing. The existing roof must be structurally sound.'],
+            ['q' => 'Does silicone coating stop roof leaks?', 'a' => 'Yes, silicone coating creates a seamless waterproof membrane over your entire roof. It fills cracks, seals seams, and prevents ponding water damage — the most common cause of flat roof leaks.'],
+        ],
+    ];
+    return $all[$category] ?? $all['installation'];
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -839,6 +918,213 @@ function golem_geo_city_content(string $content): string {
 <div class="gc-other gc-section">
 <h2>Other Cities We Serve</h2>
 <div class="gc-city-links">{$other_html}</div>
+</div>
+
+</div>
+HTML;
+
+    return $html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 5b. SERVICE PAGE CONTENT
+// ═══════════════════════════════════════════════════════════════
+
+add_filter('the_content', 'golem_geo_service_content', 21);
+function golem_geo_service_content(string $content): string {
+    if (!is_singular('page') || !in_the_loop() || !is_main_query()) return $content;
+
+    global $post;
+    $slug     = $post->post_name;
+    $services = golem_geo_get_services();
+    $match    = null;
+
+    foreach ($services as $s) {
+        if ($slug === $s['slug']) {
+            $match = $s;
+            break;
+        }
+    }
+
+    if (!$match) return $content;
+
+    $name        = esc_html($match['name']);
+    $category    = $match['category'];
+    $areas       = golem_geo_get_service_areas();
+    $descs       = golem_geo_get_service_descriptions();
+    $desc        = $descs[$match['name']] ?? '';
+    $faqs        = golem_geo_get_service_faqs($category);
+    $site        = 'https://golemroofing.com';
+    $cities_list = implode(', ', array_map(fn($a) => $a['city'], $areas));
+    $intro       = esc_html("Golem Roofing provides professional " . strtolower($match['name']) . " services across Los Angeles and Orange County, California. " . $desc . " We serve homeowners in " . $cities_list . " and surrounding areas.");
+
+    // City links
+    $city_html = '';
+    foreach ($areas as $a) {
+        $zips = esc_html(implode(', ', $a['zips']));
+        $city_html .= '<a href="' . esc_url($site . '/' . $a['slug'] . '/') . '" class="gc-city-link">' . esc_html($a['city']) . ' <small>(' . $zips . ')</small></a>';
+    }
+
+    // Related services (same category, excluding current)
+    $related_html = '';
+    foreach ($services as $s) {
+        if ($s['slug'] === $match['slug']) continue;
+        if ($s['category'] === $category) {
+            $related_html .= '<a href="' . esc_url($site . '/' . $s['slug'] . '/') . '" class="gc-city-link">' . esc_html($s['name']) . '</a>';
+        }
+    }
+    $related_section = '';
+    if (!empty($related_html)) {
+        $related_section = '<div class="gc-section"><h2>Related Services</h2><div class="gc-city-links">' . $related_html . '</div></div>';
+    }
+
+    // Other category services
+    $groups = ['installation' => 'Installation', 'replacement' => 'Replacement', 'repair' => 'Repair', 'special' => 'Specialty'];
+    $icons  = ['installation' => "\xF0\x9F\x8F\x97\xEF\xB8\x8F", 'replacement' => "\xF0\x9F\x94\x84", 'repair' => "\xF0\x9F\x94\xA7", 'special' => "\xE2\xAD\x90"];
+    $other_svc_html = '';
+    foreach ($groups as $cat => $label) {
+        if ($cat === $category) continue;
+        $items = array_filter($services, fn($s) => $s['category'] === $cat);
+        if (empty($items)) continue;
+        $list = '';
+        foreach ($items as $s) {
+            $list .= '<li><a href="' . esc_url($site . '/' . $s['slug'] . '/') . '">' . esc_html($s['name']) . '</a></li>';
+        }
+        $other_svc_html .= '<div class="gc-svc-card"><div class="gc-svc-icon">' . $icons[$cat] . '</div><h3>' . esc_html($label) . '</h3><ul>' . $list . '</ul></div>';
+    }
+
+    // FAQ accordion
+    $faq_html = '';
+    foreach ($faqs as $i => $f) {
+        $open = $i === 0 ? ' open' : '';
+        $faq_html .= '<details class="gc-faq"' . $open . '><summary>' . esc_html($f['q']) . '</summary><p>' . esc_html($f['a']) . '</p></details>';
+    }
+
+    // Credentials
+    $creds = [
+        ["\xF0\x9F\x9B\xA1\xEF\xB8\x8F", '15-Year Warranty', 'Workmanship guarantee on every project'],
+        ["\xF0\x9F\x93\x8B", 'CSLB Licensed', 'California State License Board certified'],
+        ["\xF0\x9F\x92\xB0", '$1M Insurance', 'Full liability coverage + $25K bond'],
+        ["\xE2\xAD\x90", '5.0 Rating', '47 five-star reviews on Google'],
+        ["\xF0\x9F\x8F\xA6", 'Financing', 'From $149/mo via Acorn Finance'],
+        ["\xF0\x9F\x94\x92", '$250K Guarantee', 'Third-party backed by Directorii'],
+    ];
+    $cred_html = '';
+    foreach ($creds as $c) {
+        $cred_html .= '<div class="gc-cred"><div class="gc-cred-icon">' . $c[0] . '</div><strong>' . esc_html($c[1]) . '</strong><span>' . esc_html($c[2]) . '</span></div>';
+    }
+
+    // What's included
+    $includes = [
+        'installation' => ['Free roof inspection and measurement', 'Old roof tear-off (if applicable)', 'Roof deck inspection and repair', 'Premium underlayment installation', 'New drip edge and flashing', 'Full material installation', 'Cleanup and debris removal', '15-year workmanship warranty'],
+        'replacement'  => ['Complete tear-off of existing roof', 'Deck inspection and structural repair', 'New underlayment and ice/water shield', 'New drip edge, flashing, and vents', 'Premium material installation', 'Ridge cap and finishing', 'Full cleanup and debris hauling', '15-year workmanship warranty'],
+        'repair'       => ['Thorough roof inspection', 'Leak source identification', 'Damaged material replacement', 'Flashing repair or replacement', 'Sealant and caulking', 'Before/after documentation', 'Repair warranty included'],
+        'special'      => ['Roof surface cleaning and prep', 'Seam and crack repair', 'Primer application', 'Silicone coating (2 coats)', 'Ponding water treatment', 'UV-reflective finish', 'No tear-off required', '15-year coating warranty'],
+    ];
+    $inc_html = '';
+    foreach (($includes[$category] ?? $includes['installation']) as $item) {
+        $inc_html .= '<li>' . esc_html($item) . '</li>';
+    }
+
+    $html = <<<HTML
+<style>
+.gc-landing{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1a;max-width:960px;margin:0 auto;padding:0 16px}
+.gc-hero{text-align:center;padding:48px 0 32px;border-bottom:3px solid #1a5276}
+.gc-hero h1{font-size:clamp(1.6rem,4vw,2.4rem);color:#1a5276;margin:0 0 12px;line-height:1.2}
+.gc-hero .gc-subtitle{font-size:clamp(1rem,2.5vw,1.25rem);color:#555;margin:0 0 20px}
+.gc-cta-btn{display:inline-block;background:#1a5276;color:#fff!important;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:1.05rem;margin-top:20px;transition:background .2s}
+.gc-cta-btn:hover{background:#154360;color:#fff!important}
+.gc-section{padding:40px 0}
+.gc-section h2{font-size:clamp(1.3rem,3vw,1.8rem);color:#1a5276;margin:0 0 24px;text-align:center}
+.gc-section h2::after{content:'';display:block;width:60px;height:3px;background:#e67e22;margin:10px auto 0}
+.gc-about-text{max-width:720px;margin:0 auto;line-height:1.8;color:#444;font-size:1.05rem;text-align:center}
+.gc-includes{list-style:none;padding:0;max-width:600px;margin:0 auto}
+.gc-includes li{padding:10px 0;border-bottom:1px solid #e9ecef;font-size:.95rem;color:#444}
+.gc-includes li:last-child{border-bottom:none}
+.gc-svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.gc-svc-card{background:#f8f9fa;border-radius:10px;padding:24px 20px;text-align:center;border:1px solid #e9ecef}
+.gc-svc-card h3{margin:8px 0 12px;color:#1a5276;font-size:1.1rem}
+.gc-svc-icon{font-size:2rem;line-height:1}
+.gc-svc-card ul{list-style:none;padding:0;margin:0;text-align:left}
+.gc-svc-card li{padding:6px 0;border-bottom:1px solid #e9ecef;font-size:.9rem}
+.gc-svc-card li:last-child{border-bottom:none}
+.gc-svc-card a{color:#1a5276;text-decoration:none}
+.gc-svc-card a:hover{text-decoration:underline}
+.gc-creds{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+.gc-cred{background:#fff;border:1px solid #e9ecef;border-radius:10px;padding:20px 16px;text-align:center}
+.gc-cred-icon{font-size:1.8rem;margin-bottom:6px}
+.gc-cred strong{display:block;color:#1a5276;font-size:.95rem;margin-bottom:4px}
+.gc-cred span{font-size:.8rem;color:#777}
+.gc-faq{border:1px solid #e9ecef;border-radius:8px;margin-bottom:10px;overflow:hidden}
+.gc-faq summary{padding:14px 18px;cursor:pointer;font-weight:600;color:#1a5276;background:#f8f9fa;font-size:.95rem;list-style:none}
+.gc-faq summary::-webkit-details-marker{display:none}
+.gc-faq summary::before{content:'+';margin-right:10px;font-weight:700;color:#e67e22}
+.gc-faq[open] summary::before{content:'-'}
+.gc-faq p{padding:12px 18px 16px;margin:0;color:#555;font-size:.9rem;line-height:1.6}
+.gc-city-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.gc-city-link{background:#eaf2f8;color:#1a5276;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:.9rem;font-weight:500}
+.gc-city-link:hover{background:#1a5276;color:#fff}
+.gc-city-link small{color:#777;font-weight:400}
+.gc-cta-box{text-align:center;background:#1a5276;color:#fff;padding:40px 24px;border-radius:12px;margin:32px 0}
+.gc-cta-box h2{color:#fff!important;margin-bottom:12px}
+.gc-cta-box h2::after{background:#e67e22}
+.gc-cta-box p{color:rgba(255,255,255,.85);margin:0 0 20px;font-size:1rem}
+.gc-cta-box .gc-cta-btn{background:#e67e22;color:#fff!important}
+.gc-cta-box .gc-cta-btn:hover{background:#cf6d17}
+.gc-cta-box .gc-phone{display:block;margin-top:12px;color:#fff;font-size:1.1rem;text-decoration:none;font-weight:600}
+@media(max-width:600px){
+.gc-hero{padding:32px 0 24px}
+.gc-section{padding:28px 0}
+.gc-svc-grid{grid-template-columns:1fr 1fr}
+.gc-creds{grid-template-columns:1fr 1fr}
+.gc-cta-box{padding:28px 16px;border-radius:8px}
+}
+</style>
+<div class="gc-landing">
+
+<div class="gc-hero">
+<h1>{$name} in Los Angeles &amp; Orange County</h1>
+<p class="gc-subtitle">Licensed &amp; Insured &middot; 15-Year Warranty &middot; Free Estimates</p>
+<a href="tel:+15629918165" class="gc-cta-btn">&#128222; Call (562) 991-8165</a>
+</div>
+
+<div class="gc-section">
+<h2>About This Service</h2>
+<p class="gc-about-text">{$intro}</p>
+</div>
+
+<div class="gc-section">
+<h2>What&rsquo;s Included</h2>
+<ul class="gc-includes">{$inc_html}</ul>
+</div>
+
+<div class="gc-section">
+<h2>Cities We Serve</h2>
+<div class="gc-city-links">{$city_html}</div>
+</div>
+
+<div class="gc-section">
+<h2>Why Choose Golem Roofing</h2>
+<div class="gc-creds">{$cred_html}</div>
+</div>
+
+<div class="gc-cta-box">
+<h2>Get a Free {$name} Estimate</h2>
+<p>Contact us for a free inspection and detailed quote. Financing available from \$149/month.</p>
+<a href="#elementor-action%3Aaction%3Dpopup%3Aopen%26settings%3DeyJpZCI6Ijk3IiwidG9nZ2xlIjpmYWxzZX0%3D" class="gc-cta-btn">Get A Free Quote</a>
+<a href="tel:+15629918165" class="gc-phone">&#128222; (562) 991-8165</a>
+</div>
+
+<div class="gc-section">
+<h2>Frequently Asked Questions</h2>
+{$faq_html}
+</div>
+
+{$related_section}
+
+<div class="gc-section">
+<h2>All Roofing Services</h2>
+<div class="gc-svc-grid">{$other_svc_html}</div>
 </div>
 
 </div>
