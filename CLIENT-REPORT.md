@@ -40,7 +40,7 @@
 - ✅ Applebot (Apple Intelligence / Siri)
 
 ### 8 городских страниц с гео-привязкой
-Каждая страница содержит структурированные данные (Schema.org) с GPS-координатами, списком районов и почтовыми индексами:
+Каждая страница содержит структурированные данные (Schema.org) с GPS-координатами, полным перечнем услуг, списком районов и почтовыми индексами:
 
 | Город | Ссылка |
 |-------|--------|
@@ -60,6 +60,36 @@
 - Местные ориентиры (landmarks)
 - Почтовые индексы (ZIP codes)
 - Полный перечень из 15 услуг
+
+### 15 сервисных страниц
+Каждая услуга имеет отдельную страницу с описанием, FAQ, списком городов, креденшалами и Schema.org (Service + FAQPage + BreadcrumbList):
+
+| Услуга | Ссылка |
+|--------|--------|
+| Roof Installation | [golemroofing.com/roof-installation/](https://golemroofing.com/roof-installation/) |
+| Flat Roof Installation | [golemroofing.com/flat-roof-installation/](https://golemroofing.com/flat-roof-installation/) |
+| Tile Roof Installation | [golemroofing.com/tile-roof-installation/](https://golemroofing.com/tile-roof-installation/) |
+| Shingle Roof Installation | [golemroofing.com/shingle-roof-installation/](https://golemroofing.com/shingle-roof-installation/) |
+| Roof Replacement | [golemroofing.com/roof-replacement/](https://golemroofing.com/roof-replacement/) |
+| Flat Roof Replacement | [golemroofing.com/flat-roof-replacement/](https://golemroofing.com/flat-roof-replacement/) |
+| Tile Roof Replacement | [golemroofing.com/tile-roof-replacement/](https://golemroofing.com/tile-roof-replacement/) |
+| Shingle Roof Replacement | [golemroofing.com/shingle-roof-replacement/](https://golemroofing.com/shingle-roof-replacement/) |
+| Clay Tile Roof Replacement | [golemroofing.com/clay-tile-roof-replacement/](https://golemroofing.com/clay-tile-roof-replacement/) |
+| Concrete Tile Roof Replacement | [golemroofing.com/concrete-tile-roof-replacement/](https://golemroofing.com/concrete-tile-roof-replacement/) |
+| Roof Repair | [golemroofing.com/roof-repair/](https://golemroofing.com/roof-repair/) |
+| Flat Roof Repair | [golemroofing.com/flat-roof-repair/](https://golemroofing.com/flat-roof-repair/) |
+| Tile Roof Repair | [golemroofing.com/tile-roof-repair/](https://golemroofing.com/tile-roof-repair/) |
+| Shingle Roof Repair | [golemroofing.com/shingle-roof-repair/](https://golemroofing.com/shingle-roof-repair/) |
+| Silicone Roof Restoration | [golemroofing.com/silicone-roof-restoration/](https://golemroofing.com/silicone-roof-restoration/) |
+
+Каждая страница включает:
+- Описание услуги
+- Что входит в услугу (чеклист)
+- 5 FAQ специфичных для категории (установка / замена / ремонт / силикон)
+- Ссылки на все 8 городов обслуживания
+- Ссылки на родственные услуги
+- CTA: телефон + форма + финансирование
+- Schema: Service + FAQPage + BreadcrumbList
 
 ---
 
@@ -92,6 +122,7 @@
 | **Кэширование** | Нет | WP Super Cache |
 | **Формат изображений** | JPEG / PNG | WebP |
 | **Контекстные alt-теги** | 21% | 100% |
+| **Сервисные страницы** | Нет | 15 страниц |
 | **Schema-блоков на страницу** | 1 | 3-6 |
 | **LCP Preload** | Нет | Да |
 
@@ -122,8 +153,9 @@
 
 ## Итог
 
-Сайт golemroofing.com полностью подготовлен для работы как в классическом поиске Google, так и в новых AI-поисковых системах. Каждый город обслуживания имеет отдельную страницу с гео-привязкой, а 56 блог-постов оптимизированы по структурированным данным. Скорость сайта увеличена в 25 раз.
+Сайт golemroofing.com полностью подготовлен для работы как в классическом поиске Google, так и в новых AI-поисковых системах. Каждый город обслуживания имеет отдельную страницу с гео-привязкой, каждая услуга — отдельную страницу с FAQ и Schema, а 56 блог-постов оптимизированы по структурированным данным. Скорость сайта увеличена в 25 раз.
 
 ---
 
 *Отчёт подготовлен: Март 2026*
+*Обновлено: 11 марта 2026 — добавлены 15 сервисных страниц, удалён deprecated golem-schema.php, исправлен llms.txt redirect*
