@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Golem GEO Engine
- * Description: GEO optimization — llms.txt, AI-friendly robots.txt, enhanced Schema.org, BreadcrumbList
- * Version: 1.0.0
+ * Description: GEO optimization — llms.txt, AI-friendly robots.txt, enhanced Schema.org, BreadcrumbList, city landing pages
+ * Version: 1.1.0
  * Author: Golem Roofing Dev Team
  */
 
@@ -652,7 +652,203 @@ function golem_geo_emit_jsonld(array $data): void {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 5. DEACTIVATE OLD SCHEMA PLUGIN (golem-schema.php)
+// 5. CITY LANDING PAGE CONTENT
+// ═══════════════════════════════════════════════════════════════
+
+add_filter('the_content', 'golem_geo_city_content', 20);
+function golem_geo_city_content(string $content): string {
+    if (!is_singular('page') || !in_the_loop() || !is_main_query()) return $content;
+
+    global $post;
+    $slug  = $post->post_name;
+    $areas = golem_geo_get_service_areas();
+    $match = null;
+
+    foreach ($areas as $a) {
+        if ($slug === $a['slug']) {
+            $match = $a;
+            break;
+        }
+    }
+
+    if (!$match) return $content;
+
+    $city       = esc_html($match['city']);
+    $state      = esc_html($match['state']);
+    $zips       = esc_html(implode(', ', $match['zips']));
+    $hoods      = $match['neighborhoods'];
+    $landmarks  = $match['landmarks'];
+    $services   = golem_geo_get_services();
+    $faqs       = golem_geo_get_homepage_faqs();
+    $site       = 'https://golemroofing.com';
+
+    // Neighborhood pills
+    $hood_html = '';
+    foreach ($hoods as $h) {
+        $hood_html .= '<span class="gc-pill">' . esc_html($h) . '</span>';
+    }
+
+    // Landmark pills
+    $mark_html = '';
+    foreach ($landmarks as $m) {
+        $mark_html .= '<span class="gc-pill gc-pill--outline">' . esc_html($m) . '</span>';
+    }
+
+    // Service cards (grouped)
+    $groups = ['installation' => 'Installation', 'replacement' => 'Replacement', 'repair' => 'Repair', 'special' => 'Specialty'];
+    $icons  = ['installation' => '🏗️', 'replacement' => '🔄', 'repair' => '🔧', 'special' => '⭐'];
+    $svc_html = '';
+    foreach ($groups as $cat => $label) {
+        $items = array_filter($services, fn($s) => $s['category'] === $cat);
+        if (empty($items)) continue;
+        $list = '';
+        foreach ($items as $s) {
+            $list .= '<li><a href="' . esc_url($site . '/' . $s['slug'] . '/') . '">' . esc_html($s['name']) . '</a></li>';
+        }
+        $icon = $icons[$cat];
+        $svc_html .= '<div class="gc-svc-card"><div class="gc-svc-icon">' . $icon . '</div><h3>' . esc_html($label) . '</h3><ul>' . $list . '</ul></div>';
+    }
+
+    // FAQ accordion
+    $faq_html = '';
+    $city_faqs = array_slice($faqs, 0, 6);
+    foreach ($city_faqs as $i => $f) {
+        $q = esc_html($f['q']);
+        $a_text = esc_html($f['a']);
+        $open = $i === 0 ? ' open' : '';
+        $faq_html .= '<details class="gc-faq"' . $open . '><summary>' . $q . '</summary><p>' . $a_text . '</p></details>';
+    }
+
+    // Credentials
+    $creds = [
+        ['🛡️', '15-Year Warranty', 'Workmanship guarantee on every project'],
+        ['📋', 'CSLB Licensed', 'California State License Board certified'],
+        ['💰', '$1M Insurance', 'Full liability coverage + $25K bond'],
+        ['⭐', '5.0 Rating', '47 five-star reviews on Google'],
+        ['🏦', 'Financing', 'From $149/mo via Acorn Finance'],
+        ['🔒', '$250K Guarantee', 'Third-party backed by Directorii'],
+    ];
+    $cred_html = '';
+    foreach ($creds as $c) {
+        $cred_html .= '<div class="gc-cred"><div class="gc-cred-icon">' . $c[0] . '</div><strong>' . esc_html($c[1]) . '</strong><span>' . esc_html($c[2]) . '</span></div>';
+    }
+
+    // Other cities
+    $other_html = '';
+    foreach ($areas as $a) {
+        if ($a['slug'] === $slug) continue;
+        $other_html .= '<a href="' . esc_url($site . '/' . $a['slug'] . '/') . '" class="gc-city-link">' . esc_html($a['city']) . '</a>';
+    }
+
+    $html = <<<HTML
+<style>
+.gc-landing{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1a;max-width:960px;margin:0 auto;padding:0 16px}
+.gc-hero{text-align:center;padding:48px 0 32px;border-bottom:3px solid #1a5276}
+.gc-hero h1{font-size:clamp(1.6rem,4vw,2.4rem);color:#1a5276;margin:0 0 12px;line-height:1.2}
+.gc-hero .gc-subtitle{font-size:clamp(1rem,2.5vw,1.25rem);color:#555;margin:0 0 20px}
+.gc-hero .gc-zips{font-size:.9rem;color:#777;margin:0}
+.gc-cta-btn{display:inline-block;background:#1a5276;color:#fff!important;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:1.05rem;margin-top:20px;transition:background .2s}
+.gc-cta-btn:hover{background:#154360;color:#fff!important}
+.gc-section{padding:40px 0}
+.gc-section h2{font-size:clamp(1.3rem,3vw,1.8rem);color:#1a5276;margin:0 0 24px;text-align:center}
+.gc-section h2::after{content:'';display:block;width:60px;height:3px;background:#e67e22;margin:10px auto 0}
+.gc-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.gc-pill{background:#eaf2f8;color:#1a5276;padding:6px 14px;border-radius:20px;font-size:.9rem;font-weight:500}
+.gc-pill--outline{background:transparent;border:1px solid #ccc;color:#555}
+.gc-svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.gc-svc-card{background:#f8f9fa;border-radius:10px;padding:24px 20px;text-align:center;border:1px solid #e9ecef}
+.gc-svc-card h3{margin:8px 0 12px;color:#1a5276;font-size:1.1rem}
+.gc-svc-icon{font-size:2rem;line-height:1}
+.gc-svc-card ul{list-style:none;padding:0;margin:0;text-align:left}
+.gc-svc-card li{padding:6px 0;border-bottom:1px solid #e9ecef;font-size:.9rem}
+.gc-svc-card li:last-child{border-bottom:none}
+.gc-svc-card a{color:#1a5276;text-decoration:none}
+.gc-svc-card a:hover{text-decoration:underline}
+.gc-creds{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+.gc-cred{background:#fff;border:1px solid #e9ecef;border-radius:10px;padding:20px 16px;text-align:center}
+.gc-cred-icon{font-size:1.8rem;margin-bottom:6px}
+.gc-cred strong{display:block;color:#1a5276;font-size:.95rem;margin-bottom:4px}
+.gc-cred span{font-size:.8rem;color:#777}
+.gc-faq{border:1px solid #e9ecef;border-radius:8px;margin-bottom:10px;overflow:hidden}
+.gc-faq summary{padding:14px 18px;cursor:pointer;font-weight:600;color:#1a5276;background:#f8f9fa;font-size:.95rem;list-style:none}
+.gc-faq summary::-webkit-details-marker{display:none}
+.gc-faq summary::before{content:'＋';margin-right:10px;font-weight:700;color:#e67e22}
+.gc-faq[open] summary::before{content:'−'}
+.gc-faq p{padding:12px 18px 16px;margin:0;color:#555;font-size:.9rem;line-height:1.6}
+.gc-other{text-align:center;padding:40px 0 20px;border-top:1px solid #e9ecef}
+.gc-other h2::after{display:none}
+.gc-city-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.gc-city-link{background:#eaf2f8;color:#1a5276;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:.9rem;font-weight:500}
+.gc-city-link:hover{background:#1a5276;color:#fff}
+.gc-cta-box{text-align:center;background:#1a5276;color:#fff;padding:40px 24px;border-radius:12px;margin:32px 0}
+.gc-cta-box h2{color:#fff!important;margin-bottom:12px}
+.gc-cta-box h2::after{background:#e67e22}
+.gc-cta-box p{color:rgba(255,255,255,.85);margin:0 0 20px;font-size:1rem}
+.gc-cta-box .gc-cta-btn{background:#e67e22;color:#fff!important}
+.gc-cta-box .gc-cta-btn:hover{background:#cf6d17}
+.gc-cta-box .gc-phone{display:block;margin-top:12px;color:#fff;font-size:1.1rem;text-decoration:none;font-weight:600}
+@media(max-width:600px){
+.gc-hero{padding:32px 0 24px}
+.gc-section{padding:28px 0}
+.gc-svc-grid{grid-template-columns:1fr 1fr}
+.gc-creds{grid-template-columns:1fr 1fr}
+.gc-cta-box{padding:28px 16px;border-radius:8px}
+}
+</style>
+<div class="gc-landing">
+
+<div class="gc-hero">
+<h1>Professional Roofing in {$city}, {$state}</h1>
+<p class="gc-subtitle">Licensed Roof Installation, Replacement &amp; Repair</p>
+<p class="gc-zips">Serving ZIP: {$zips}</p>
+<a href="tel:+15629918165" class="gc-cta-btn">📞 Call (562) 991-8165</a>
+</div>
+
+<div class="gc-section">
+<h2>Neighborhoods We Serve in {$city}</h2>
+<div class="gc-pills">{$hood_html}</div>
+</div>
+
+<div class="gc-section">
+<h2>Local Landmarks</h2>
+<div class="gc-pills">{$mark_html}</div>
+</div>
+
+<div class="gc-section">
+<h2>Our Roofing Services</h2>
+<div class="gc-svc-grid">{$svc_html}</div>
+</div>
+
+<div class="gc-section">
+<h2>Why Choose Golem Roofing</h2>
+<div class="gc-creds">{$cred_html}</div>
+</div>
+
+<div class="gc-cta-box">
+<h2>Get a Free Roof Estimate in {$city}</h2>
+<p>We offer free inspections for homeowners in {$city} and surrounding areas.</p>
+<a href="#elementor-action%3Aaction%3Dpopup%3Aopen%26settings%3DeyJpZCI6Ijk3IiwidG9nZ2xlIjpmYWxzZX0%3D" class="gc-cta-btn">Get A Free Quote</a>
+<a href="tel:+15629918165" class="gc-phone">📞 (562) 991-8165</a>
+</div>
+
+<div class="gc-section">
+<h2>Frequently Asked Questions</h2>
+{$faq_html}
+</div>
+
+<div class="gc-other gc-section">
+<h2>Other Cities We Serve</h2>
+<div class="gc-city-links">{$other_html}</div>
+</div>
+
+</div>
+HTML;
+
+    return $html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 6. DEACTIVATE OLD SCHEMA PLUGIN (golem-schema.php)
 // ═══════════════════════════════════════════════════════════════
 
 // Remove old schema hooks if golem-schema.php is still active
