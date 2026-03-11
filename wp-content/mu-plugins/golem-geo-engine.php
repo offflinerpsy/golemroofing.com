@@ -133,6 +133,12 @@ add_filter('query_vars', function (array $vars): array {
 });
 
 add_action('template_redirect', 'golem_geo_serve_llms');
+
+// Prevent WP canonical redirect from adding trailing slash to llms.txt
+add_filter('redirect_canonical', function ($redirect_url) {
+    if (get_query_var('golem_llms')) return false;
+    return $redirect_url;
+}, 10, 1);
 function golem_geo_serve_llms(): void {
     $mode = get_query_var('golem_llms');
     if (!$mode) return;
