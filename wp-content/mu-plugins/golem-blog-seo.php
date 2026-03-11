@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Golem Blog SEO & Cross-Links
- * Description: Article Schema.org for blog posts + automatic service area cross-links + FAQ Schema
- * Version: 2.0
+ * Description: Article Schema.org + cross-links (cities & services) + FAQ Schema + auto internal linking
+ * Version: 3.0
  */
 
 if (!defined('ABSPATH')) exit;
@@ -157,9 +157,32 @@ function golem_blog_crosslinks($content) {
         ['slug' => 'roofing-rancho-palos-verdes-ca', 'name' => 'Rancho Palos Verdes'],
     ];
 
-    $links_html = '';
+    $services = [
+        ['slug' => 'roof-installation', 'name' => 'Roof Installation'],
+        ['slug' => 'roof-replacement', 'name' => 'Roof Replacement'],
+        ['slug' => 'roof-repair', 'name' => 'Roof Repair'],
+        ['slug' => 'roof-inspection', 'name' => 'Roof Inspection'],
+        ['slug' => 'roof-maintenance', 'name' => 'Roof Maintenance'],
+        ['slug' => 'roof-leak-repair', 'name' => 'Roof Leak Repair'],
+        ['slug' => 'tile-roof-installation', 'name' => 'Tile Roof Installation'],
+        ['slug' => 'concrete-tile-roofing', 'name' => 'Concrete Tile Roofing'],
+        ['slug' => 'metal-roofing', 'name' => 'Metal Roofing'],
+        ['slug' => 'tpo-roofing', 'name' => 'TPO Roofing'],
+        ['slug' => 'silicone-roof-coating', 'name' => 'Silicone Roof Coating'],
+        ['slug' => 'shingle-roofing', 'name' => 'Shingle Roofing'],
+        ['slug' => 'solar-roofing', 'name' => 'Solar Roofing'],
+        ['slug' => 'skylight-installation', 'name' => 'Skylight Installation'],
+        ['slug' => 'roof-financing', 'name' => 'Roof Financing'],
+    ];
+
+    $city_links = '';
     foreach ($cities as $city) {
-        $links_html .= '<li><a href="/' . esc_attr($city['slug']) . '/">' . esc_html($city['name']) . '</a></li>' . "\n";
+        $city_links .= '<li><a href="/' . esc_attr($city['slug']) . '/">' . esc_html($city['name']) . '</a></li>' . "\n";
+    }
+
+    $service_links = '';
+    foreach ($services as $svc) {
+        $service_links .= '<li><a href="/' . esc_attr($svc['slug']) . '/">' . esc_html($svc['name']) . '</a></li>' . "\n";
     }
 
     $crosslink_block = '
@@ -167,7 +190,10 @@ function golem_blog_crosslinks($content) {
 <div class="golem-tips" style="margin-top: 2rem;">
     <h5>Golem Roofing Service Areas</h5>
     <ul style="column-count: 2; column-gap: 1.5rem;">
-' . $links_html . '    </ul>
+' . $city_links . '    </ul>
+    <h5 style="margin-top: 1.25rem;">Our Roofing Services</h5>
+    <ul style="column-count: 3; column-gap: 1.5rem;">
+' . $service_links . '    </ul>
     <p style="margin-top: 0.75rem; font-size: 0.85rem; color: rgba(30,29,35,0.6);">Licensed roofing contractor serving Los Angeles County and Orange County. GAF Certified. 50-year warranty. <strong>(562) 991-8165</strong></p>
 </div>
 <!-- /wp:html -->';
@@ -182,4 +208,99 @@ function golem_blog_crosslinks($content) {
     }
 
     return $content;
+}
+
+// ===== 3. AUTO INTERNAL LINKS — SERVICE KEYWORDS IN POST BODY =====
+add_filter('the_content', 'golem_blog_autolinks', 18);
+function golem_blog_autolinks($content) {
+    if (!is_single() || get_post_type() !== 'post') return $content;
+
+    // Keyword => URL, ordered longest-first to avoid partial matches
+    $service_links = [
+        'silicone roof coating'  => '/silicone-roof-coating/',
+        'tile roof installation' => '/tile-roof-installation/',
+        'concrete tile roofing'  => '/concrete-tile-roofing/',
+        'skylight installation'  => '/skylight-installation/',
+        'roof leak repair'       => '/roof-leak-repair/',
+        'roof installation'      => '/roof-installation/',
+        'roof replacement'       => '/roof-replacement/',
+        'roof inspection'        => '/roof-inspection/',
+        'roof maintenance'       => '/roof-maintenance/',
+        'shingle roofing'        => '/shingle-roofing/',
+        'metal roofing'          => '/metal-roofing/',
+        'solar roofing'          => '/solar-roofing/',
+        'roof financing'         => '/roof-financing/',
+        'tpo roofing'            => '/tpo-roofing/',
+        'roof repair'            => '/roof-repair/',
+        'concrete tile'          => '/concrete-tile-roofing/',
+        'silicone coating'       => '/silicone-roof-coating/',
+        'metal roof'             => '/metal-roofing/',
+        'solar panel'            => '/solar-roofing/',
+        'tpo roof'               => '/tpo-roofing/',
+        'leak repair'            => '/roof-leak-repair/',
+        'asphalt shingle'        => '/shingle-roofing/',
+        'shingle roof'           => '/shingle-roofing/',
+    ];
+
+    $linked_urls = [];
+    $max_links   = 4;
+
+    foreach ($service_links as $keyword => $url) {
+        if (count($linked_urls) >= $max_links) break;
+        if (in_array($url, $linked_urls, true)) continue;
+        // Skip if this URL is already linked in content
+        if (stripos($content, 'href="' . $url) !== false) {
+            $linked_urls[] = $url;
+            continue;
+        }
+
+        $result = golem_autolink_first($content, $keyword, $url);
+        if ($result !== null) {
+            $content = $result;
+            $linked_urls[] = $url;
+        }
+    }
+
+    return $content;
+}
+
+/**
+ * Link first text-node occurrence of $keyword to $url.
+ * Skips content inside <a>, <h1>-<h6>, <script>, <style>, <button> tags.
+ * Returns modified content string, or null if no match found.
+ */
+function golem_autolink_first(string $content, string $keyword, string $url): ?string {
+    $parts = preg_split('/(<[^>]+>)/s', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $skip_depth = 0;
+    $replaced   = false;
+    $pattern    = '/\b(' . preg_quote($keyword, '/') . ')\b/i';
+
+    for ($i = 0, $len = count($parts); $i < $len; $i++) {
+        $part = $parts[$i];
+        if ($part === '') continue;
+
+        // HTML tag
+        if ($part[0] === '<') {
+            if (preg_match('/^<(a|h[1-6]|script|style|button)\b/i', $part)) {
+                $skip_depth++;
+            } elseif (preg_match('/^<\/(a|h[1-6]|script|style|button)>/i', $part)) {
+                $skip_depth = max(0, $skip_depth - 1);
+            }
+            continue;
+        }
+
+        // Text node — try to replace first occurrence
+        if (!$replaced && $skip_depth === 0 && preg_match($pattern, $part)) {
+            $parts[$i] = preg_replace(
+                $pattern,
+                '<a href="' . esc_url($url) . '">$1</a>',
+                $part,
+                1
+            );
+            $replaced = true;
+            break;
+        }
+    }
+
+    return $replaced ? implode('', $parts) : null;
 }
