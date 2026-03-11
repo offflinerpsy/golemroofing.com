@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Golem GEO Engine
- * Description: GEO optimization — llms.txt, AI-friendly robots.txt, enhanced Schema.org, BreadcrumbList, city landing pages
- * Version: 1.1.0
+ * Description: GEO optimization — llms.txt, AI-friendly robots.txt, enhanced Schema.org, BreadcrumbList, city landing pages, About Us page, footer branding
+ * Version: 1.2.1
  * Author: Golem Roofing Dev Team
  */
 
@@ -358,7 +358,7 @@ function golem_geo_schema_homepage(): void {
         'sameAs' => [
             'https://www.instagram.com/golemroofing/',
             'https://www.facebook.com/profile.php?id=61574735318556',
-            'https://www.yelp.com/biz/andy-s-custom-solutions-long-beach',
+            'https://www.yelp.com/biz/golem-roofing-long-beach',
         ],
         'hasOfferCatalog' => [
             '@type'           => 'OfferCatalog',
@@ -856,3 +856,230 @@ add_action('after_setup_theme', function (): void {
     remove_action('wp_head', 'golem_roofing_schema_markup', 1);
     remove_action('wp_head', 'golem_roofing_faq_schema', 2);
 }, 99);
+
+// ═══════════════════════════════════════════════════════════════
+// 7. ABOUT US PAGE CONTENT
+// ═══════════════════════════════════════════════════════════════
+
+add_filter('the_content', 'golem_geo_about_content', 20);
+function golem_geo_about_content(string $content): string {
+    if (!is_singular('page') || !in_the_loop() || !is_main_query()) return $content;
+
+    global $post;
+    if ($post->post_name !== 'about') return $content;
+
+    $areas    = golem_geo_get_service_areas();
+    $services = golem_geo_get_services();
+    $faqs     = golem_geo_get_homepage_faqs();
+    $site     = 'https://golemroofing.com';
+
+    // Service cards grouped
+    $groups = ['installation' => 'Installation', 'replacement' => 'Replacement', 'repair' => 'Repair', 'special' => 'Specialty'];
+    $icons  = ['installation' => '🏗️', 'replacement' => '🔄', 'repair' => '🔧', 'special' => '⭐'];
+    $svc_html = '';
+    foreach ($groups as $cat => $label) {
+        $items = array_filter($services, fn($s) => $s['category'] === $cat);
+        if (empty($items)) continue;
+        $list = '';
+        foreach ($items as $s) {
+            $list .= '<li><a href="' . esc_url($site . '/' . $s['slug'] . '/') . '">' . esc_html($s['name']) . '</a></li>';
+        }
+        $svc_html .= '<div class="gc-svc-card"><div class="gc-svc-icon">' . $icons[$cat] . '</div><h3>' . esc_html($label) . '</h3><ul>' . $list . '</ul></div>';
+    }
+
+    // Credentials
+    $creds = [
+        ['🛡️', '15-Year Warranty', 'Workmanship guarantee on every project'],
+        ['📋', 'CSLB License #1140626', 'California State License Board certified'],
+        ['💰', '$1M Insurance', 'Full liability coverage + $25K bond'],
+        ['⭐', '5.0 Rating', '47 five-star reviews on Google'],
+        ['🏦', 'Financing', 'From $149/mo via Acorn Finance'],
+        ['🔒', '$250K Guarantee', 'Third-party backed by Directorii'],
+        ['🏅', 'GAF Certified™', 'Factory-certified roofing contractor'],
+        ['📜', 'Est. 2018', 'Licensed, insured, and bonded'],
+    ];
+    $cred_html = '';
+    foreach ($creds as $c) {
+        $cred_html .= '<div class="gc-cred"><div class="gc-cred-icon">' . $c[0] . '</div><strong>' . esc_html($c[1]) . '</strong><span>' . esc_html($c[2]) . '</span></div>';
+    }
+
+    // Service area links
+    $area_html = '';
+    foreach ($areas as $a) {
+        $zips = esc_html(implode(', ', $a['zips']));
+        $area_html .= '<a href="' . esc_url($site . '/' . $a['slug'] . '/') . '" class="gc-city-link">' . esc_html($a['city']) . ' <small>(' . $zips . ')</small></a>';
+    }
+
+    // FAQ accordion
+    $faq_html = '';
+    foreach (array_slice($faqs, 0, 8) as $i => $f) {
+        $open = $i === 0 ? ' open' : '';
+        $faq_html .= '<details class="gc-faq"' . $open . '><summary>' . esc_html($f['q']) . '</summary><p>' . esc_html($f['a']) . '</p></details>';
+    }
+
+    $html = <<<HTML
+<style>
+.gc-landing{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1a;max-width:960px;margin:0 auto;padding:0 16px}
+.gc-hero{text-align:center;padding:48px 0 32px;border-bottom:3px solid #1a5276}
+.gc-hero h1{font-size:clamp(1.6rem,4vw,2.4rem);color:#1a5276;margin:0 0 12px;line-height:1.2}
+.gc-hero .gc-subtitle{font-size:clamp(1rem,2.5vw,1.25rem);color:#555;margin:0 0 8px}
+.gc-hero .gc-address{font-size:.9rem;color:#777;margin:0 0 4px}
+.gc-hero .gc-license{font-size:.85rem;color:#999;margin:0}
+.gc-cta-btn{display:inline-block;background:#1a5276;color:#fff!important;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:1.05rem;margin-top:20px;transition:background .2s}
+.gc-cta-btn:hover{background:#154360;color:#fff!important}
+.gc-section{padding:40px 0}
+.gc-section h2{font-size:clamp(1.3rem,3vw,1.8rem);color:#1a5276;margin:0 0 24px;text-align:center}
+.gc-section h2::after{content:'';display:block;width:60px;height:3px;background:#e67e22;margin:10px auto 0}
+.gc-about-text{max-width:720px;margin:0 auto;line-height:1.8;color:#444;font-size:1rem;text-align:center}
+.gc-svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.gc-svc-card{background:#f8f9fa;border-radius:10px;padding:24px 20px;text-align:center;border:1px solid #e9ecef}
+.gc-svc-card h3{margin:8px 0 12px;color:#1a5276;font-size:1.1rem}
+.gc-svc-icon{font-size:2rem;line-height:1}
+.gc-svc-card ul{list-style:none;padding:0;margin:0;text-align:left}
+.gc-svc-card li{padding:6px 0;border-bottom:1px solid #e9ecef;font-size:.9rem}
+.gc-svc-card li:last-child{border-bottom:none}
+.gc-svc-card a{color:#1a5276;text-decoration:none}
+.gc-svc-card a:hover{text-decoration:underline}
+.gc-creds{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+.gc-cred{background:#fff;border:1px solid #e9ecef;border-radius:10px;padding:20px 16px;text-align:center}
+.gc-cred-icon{font-size:1.8rem;margin-bottom:6px}
+.gc-cred strong{display:block;color:#1a5276;font-size:.95rem;margin-bottom:4px}
+.gc-cred span{font-size:.8rem;color:#777}
+.gc-faq{border:1px solid #e9ecef;border-radius:8px;margin-bottom:10px;overflow:hidden}
+.gc-faq summary{padding:14px 18px;cursor:pointer;font-weight:600;color:#1a5276;background:#f8f9fa;font-size:.95rem;list-style:none}
+.gc-faq summary::-webkit-details-marker{display:none}
+.gc-faq summary::before{content:'＋';margin-right:10px;font-weight:700;color:#e67e22}
+.gc-faq[open] summary::before{content:'−'}
+.gc-faq p{padding:12px 18px 16px;margin:0;color:#555;font-size:.9rem;line-height:1.6}
+.gc-city-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.gc-city-link{background:#eaf2f8;color:#1a5276;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:.9rem;font-weight:500}
+.gc-city-link:hover{background:#1a5276;color:#fff}
+.gc-city-link small{color:#777;font-weight:400}
+.gc-cta-box{text-align:center;background:#1a5276;color:#fff;padding:40px 24px;border-radius:12px;margin:32px 0}
+.gc-cta-box h2{color:#fff!important;margin-bottom:12px}
+.gc-cta-box h2::after{background:#e67e22}
+.gc-cta-box p{color:rgba(255,255,255,.85);margin:0 0 20px;font-size:1rem}
+.gc-cta-box .gc-cta-btn{background:#e67e22;color:#fff!important}
+.gc-cta-box .gc-cta-btn:hover{background:#cf6d17}
+.gc-cta-box .gc-phone{display:block;margin-top:12px;color:#fff;font-size:1.1rem;text-decoration:none;font-weight:600}
+@media(max-width:600px){
+.gc-hero{padding:32px 0 24px}
+.gc-section{padding:28px 0}
+.gc-svc-grid{grid-template-columns:1fr 1fr}
+.gc-creds{grid-template-columns:1fr 1fr}
+.gc-cta-box{padding:28px 16px;border-radius:8px}
+}
+</style>
+<div class="gc-landing">
+
+<div class="gc-hero">
+<h1>About Golem Roofing</h1>
+<p class="gc-subtitle">Licensed Roofing Contractor — Los Angeles &amp; Orange County</p>
+<p class="gc-address">📍 1821 E 5th St, Long Beach, CA 90802</p>
+<p class="gc-license">CSLB License #1140626 · GAF Certified™ · Established 2018</p>
+<a href="tel:+15629918165" class="gc-cta-btn">📞 Call (562) 991-8165</a>
+</div>
+
+<div class="gc-section">
+<h2>Who We Are</h2>
+<p class="gc-about-text">
+Golem Roofing is a licensed, insured, and bonded roofing company serving homeowners across Los Angeles and Orange County, California. Founded in 2018, we specialize in roof installation, replacement, repair, and silicone restoration. As a GAF Certified™ contractor, we deliver premium roofing solutions backed by a 15-year workmanship warranty, \$1M liability insurance, and a \$250K third-party guarantee through Directorii.
+</p>
+</div>
+
+<div class="gc-section">
+<h2>Why Choose Golem Roofing</h2>
+<div class="gc-creds">{$cred_html}</div>
+</div>
+
+<div class="gc-section">
+<h2>Our Roofing Services</h2>
+<div class="gc-svc-grid">{$svc_html}</div>
+</div>
+
+<div class="gc-section">
+<h2>Service Areas</h2>
+<div class="gc-city-links">{$area_html}</div>
+</div>
+
+<div class="gc-cta-box">
+<h2>Get a Free Roof Estimate</h2>
+<p>We offer free inspections for homeowners across LA and Orange County.</p>
+<a href="#elementor-action%3Aaction%3Dpopup%3Aopen%26settings%3DeyJpZCI6Ijk3IiwidG9nZ2xlIjpmYWxzZX0%3D" class="gc-cta-btn">Get A Free Quote</a>
+<a href="tel:+15629918165" class="gc-phone">📞 (562) 991-8165</a>
+</div>
+
+<div class="gc-section">
+<h2>Frequently Asked Questions</h2>
+{$faq_html}
+</div>
+
+</div>
+HTML;
+
+    return $html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 8. FOOTER BRANDING FIX (3-level fallback)
+// ═══════════════════════════════════════════════════════════════
+
+// --- Level 1: PHP filters (works if Phlox uses its own hooks) ---
+add_filter('auxin_the_footer_copyright', 'golem_geo_footer_copyright');
+add_filter('auxin_footer_copyright_text', 'golem_geo_footer_copyright');
+function golem_geo_footer_copyright(string $text = ''): string {
+    return '&copy; ' . gmdate('Y') . ' Golem Roofing. CA License #1140626. Long Beach, CA.';
+}
+
+// --- Level 2: PHP output buffer (catches Elementor-rendered HTML) ---
+// Hook at mu-plugins_loaded (earliest reliable WP hook) to catch even supercache
+add_action('muplugins_loaded', 'golem_geo_ob_start', 0);
+// Also hook WP Super Cache's filter to fix HTML before it gets cached
+add_filter('wp_cache_ob_callback_filter', 'golem_geo_ob_footer_replace');
+function golem_geo_ob_start(): void {
+    if (is_admin() || wp_doing_ajax() || wp_doing_cron() || (defined('REST_REQUEST') && REST_REQUEST)) {
+        return;
+    }
+    ob_start('golem_geo_ob_footer_replace');
+}
+function golem_geo_ob_footer_replace(string $html): string {
+    if (empty($html) || strlen($html) < 200) {
+        return $html;
+    }
+    $year = gmdate('Y');
+    $copy = "© {$year} Golem Roofing. CA License #1140626. Long Beach, CA.";
+    $html = preg_replace(
+        '/Copyright\s*(?:©|&copy;)?\s*\d{4}\s+averta\.?\s*All\s+Rights\s+Reserved\.?/i',
+        $copy,
+        $html
+    );
+    $html = str_replace('andy-s-custom-solutions-long-beach', 'golem-roofing-long-beach', $html);
+    return $html;
+}
+
+// --- Level 3: JS DOM fallback (last resort, if cached HTML slips through) ---
+add_action('wp_footer', 'golem_geo_footer_copyright_js', 999);
+function golem_geo_footer_copyright_js(): void {
+    $year = gmdate('Y');
+    $copy = esc_js("© {$year} Golem Roofing. CA License #1140626. Long Beach, CA.");
+    echo <<<JS
+<script>
+(function(){
+    var c='{$copy}';
+    function fix(){
+        var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+        while(w.nextNode()){
+            var n=w.currentNode;
+            if(n.nodeValue&&n.nodeValue.indexOf('averta')!==-1){
+                n.nodeValue=n.nodeValue.replace(/Copyright\s*©?\s*\d{0,4}\s*averta[^.]*/i,c);
+            }
+        }
+        document.querySelectorAll('a[href*="andy-s-custom-solutions"]').forEach(function(a){
+            a.href=a.href.replace('andy-s-custom-solutions-long-beach','golem-roofing-long-beach');
+        });
+    }
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fix);}else{fix();}
+})();
+</script>
+JS;
+}
