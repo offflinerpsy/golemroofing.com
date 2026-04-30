@@ -171,8 +171,16 @@ function golem_mobile_nav_render(): void {
     @media (max-width: 767px) {
         html,
         body {
+            height: auto !important;
             max-width: 100%;
-            overflow-x: hidden;
+            min-height: 100% !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+        }
+
+        html.golem-nav-open,
+        body.golem-nav-open {
+            overflow: hidden !important;
         }
 
         *,
@@ -197,11 +205,6 @@ function golem_mobile_nav_render(): void {
         .elementor-location-header nav {
             display: none !important;
             pointer-events: none !important;
-            visibility: hidden !important;
-        }
-
-        img[src*="seal-blue.bbb.org"]:not(.golem-proof-bbb-img) {
-            display: none !important;
             visibility: hidden !important;
         }
 
@@ -612,6 +615,114 @@ function golem_mobile_nav_render(): void {
             z-index: 1;
         }
 
+        .home main .aux-appear-watch-animation,
+        .home main .aux-animated,
+        .home main .elementor-motion-effects-element,
+        .home main .elementor-motion-effects-element-type-background,
+        .home main .elementor-motion-effects-element-type-scroll {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+
+        .home main .elementor-motion-effects-container {
+            display: none !important;
+        }
+
+        #bbb-badge {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        .home #about + .elementor-element,
+        .home #about + section {
+            margin-left: 12px !important;
+            margin-right: 12px !important;
+            margin-top: -28px !important;
+            width: calc(100% - 24px) !important;
+        }
+
+        .home #about + .elementor-element .elementor-element-e4a410b,
+        .home #about + section .elementor-element-e4a410b,
+        .home #about + .elementor-element .elementor-element-9c4675b,
+        .home #about + section .elementor-element-9c4675b {
+            border-radius: 18px !important;
+            overflow: hidden !important;
+        }
+
+        .home .elementor-element-641fd80 {
+            display: grid !important;
+            gap: 18px 16px !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        }
+
+        .home .elementor-element-641fd80 > .e-con.e-child,
+        .home .golem-home-trust-card {
+            min-width: 0 !important;
+            width: auto !important;
+        }
+
+        .home .golem-home-trust-card {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: flex-start;
+            text-align: center;
+        }
+
+        .home .golem-home-trust-card__media {
+            align-items: center;
+            display: flex;
+            height: 93px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .home .golem-home-trust-card__media img {
+            max-height: 61px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .home .golem-home-trust-card__badge {
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid rgba(20, 86, 121, 0.18);
+            border-radius: 12px;
+            color: #145679;
+            display: flex;
+            flex-direction: column;
+            font-family: "Red Hat Display", Arial, sans-serif;
+            font-weight: 900;
+            height: 61px;
+            justify-content: center;
+            line-height: 1;
+            width: 100%;
+        }
+
+        .home .golem-home-trust-card__badge strong {
+            display: block;
+            font-size: 26px;
+        }
+
+        .home .golem-home-trust-card__badge span {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 0;
+            margin-top: 4px;
+        }
+
+        .home .golem-home-trust-card__label {
+            color: #111111;
+            display: block;
+            font-family: "Red Hat Display", Arial, sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
         .elementor-section,
         .elementor-container,
         .elementor-column,
@@ -661,6 +772,26 @@ function golem_mobile_nav_render(): void {
             }, true);
         });
 
+        var homeTrustGrid = document.querySelector('.home .elementor-element-641fd80');
+        if (homeTrustGrid && !homeTrustGrid.querySelector('.golem-home-trust-card')) {
+            var bbbCard = document.createElement('div');
+            bbbCard.className = 'golem-home-trust-card';
+            bbbCard.innerHTML =
+                '<div class=\"golem-home-trust-card__media\"><img src=\"<?php echo esc_js( $bbb_url ); ?>\" alt=\"BBB Accredited Business\" loading=\"lazy\"></div>' +
+                '<div class=\"golem-home-trust-card__label\">BBB</div>';
+
+            var yearsCard = document.createElement('div');
+            yearsCard.className = 'golem-home-trust-card';
+            yearsCard.innerHTML =
+                '<div class=\"golem-home-trust-card__media\">' +
+                '<div class=\"golem-home-trust-card__badge\"><strong>12</strong><span>Years</span></div>' +
+                '</div>' +
+                '<div class=\"golem-home-trust-card__label\">Experience</div>';
+
+            homeTrustGrid.appendChild(bbbCard);
+            homeTrustGrid.appendChild(yearsCard);
+        }
+
         function setOpen(isOpen) {
             if (isOpen) {
                 drawer.removeAttribute('hidden');
@@ -670,6 +801,8 @@ function golem_mobile_nav_render(): void {
                 backdrop.classList.add('golem-nav-backdrop--visible');
                 btn.classList.add('golem-hamburger--open');
                 btn.setAttribute('aria-expanded', 'true');
+                document.documentElement.classList.add('golem-nav-open');
+                document.body.classList.add('golem-nav-open');
                 document.body.style.overflow = 'hidden';
                 return;
             }
@@ -678,6 +811,8 @@ function golem_mobile_nav_render(): void {
             backdrop.classList.remove('golem-nav-backdrop--visible');
             btn.classList.remove('golem-hamburger--open');
             btn.setAttribute('aria-expanded', 'false');
+            document.documentElement.classList.remove('golem-nav-open');
+            document.body.classList.remove('golem-nav-open');
             document.body.style.overflow = '';
             window.setTimeout(function() {
                 drawer.setAttribute('hidden', '');
