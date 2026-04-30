@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Mobile Nav
  * Description: Mobile header polish, compact drawer navigation, and first-screen overlap fixes.
- * Version: 2.0.0
+ * Version: 2.1.0
  * Author: Golem Roofing Dev
  */
 
@@ -11,11 +11,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'wp_footer', 'golem_mobile_nav_render', 30 );
+add_action( 'template_redirect', 'golem_mobile_nav_start_buffer', 1 );
+
+function golem_mobile_nav_start_buffer(): void {
+    if ( is_admin() || wp_doing_ajax() || wp_is_json_request() ) {
+        return;
+    }
+
+    ob_start( 'golem_mobile_nav_fix_experience_years' );
+}
+
+function golem_mobile_nav_fix_experience_years( string $html ): string {
+    return str_ireplace(
+        array(
+            'With over 8 years of hands-on experience',
+            'over 8 years of hands-on experience',
+            'over 8 years',
+        ),
+        array(
+            'With over 12 years of hands-on experience',
+            'over 12 years of hands-on experience',
+            'over 12 years',
+        ),
+        $html
+    );
+}
 
 function golem_mobile_nav_render(): void {
     $quote_url = home_url( '/?quote=1' );
     ?>
     <!-- GOLEM-MOBILE-NAV -->
+    <a class="golem-mobile-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="Golem Roofing home">
+        <span class="golem-mobile-brand__name">Golem Roofing</span>
+        <span class="golem-mobile-brand__tag">12 years experience</span>
+    </a>
+
+    <nav class="golem-mobile-quick" aria-label="Quick mobile links">
+        <a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About</a>
+        <a href="tel:+15629918165">Call</a>
+    </nav>
+
     <button
         id="golem-hamburger"
         class="golem-hamburger"
@@ -49,18 +84,43 @@ function golem_mobile_nav_render(): void {
             </div>
 
             <nav class="golem-nav-drawer__nav" aria-label="Mobile navigation">
-                <a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
-                <a href="<?php echo esc_url( home_url( '/services/roof-replacement/' ) ); ?>">Roof Replacement</a>
-                <a href="<?php echo esc_url( home_url( '/services/roof-repair/' ) ); ?>">Roof Repair</a>
-                <a href="<?php echo esc_url( home_url( '/services/roof-installation/' ) ); ?>">Roof Installation</a>
-                <a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>">Blog</a>
-                <a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About Us</a>
+                <div class="golem-nav-drawer__primary">
+                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
+                    <a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About Us</a>
+                    <a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>">Resources</a>
+                </div>
+
+                <details class="golem-nav-group" open>
+                    <summary>Services</summary>
+                    <div class="golem-nav-group__grid">
+                        <a href="<?php echo esc_url( home_url( '/services/roof-replacement/' ) ); ?>">Replacement</a>
+                        <a href="<?php echo esc_url( home_url( '/services/roof-repair/' ) ); ?>">Repair</a>
+                        <a href="<?php echo esc_url( home_url( '/services/roof-installation/' ) ); ?>">Installation</a>
+                        <a href="<?php echo esc_url( home_url( '/services/flat-roofing/' ) ); ?>">Flat Roofing</a>
+                        <a href="<?php echo esc_url( home_url( '/services/tile-roofing/' ) ); ?>">Tile Roofing</a>
+                        <a href="<?php echo esc_url( home_url( '/services/shingle-roofing/' ) ); ?>">Shingle Roofing</a>
+                    </div>
+                </details>
+
+                <details class="golem-nav-group">
+                    <summary>Service Areas</summary>
+                    <div class="golem-nav-group__grid">
+                        <a href="<?php echo esc_url( home_url( '/service-areas/long-beach/' ) ); ?>">Long Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/service-areas/seal-beach/' ) ); ?>">Seal Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/service-areas/redondo-beach/' ) ); ?>">Redondo Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/service-areas/manhattan-beach/' ) ); ?>">Manhattan Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/service-areas/hermosa-beach/' ) ); ?>">Hermosa Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/service-areas/palos-verdes-estates/' ) ); ?>">Palos Verdes</a>
+                    </div>
+                </details>
             </nav>
 
             <div class="golem-nav-drawer__proof" aria-label="Trust signals">
-                <span>BBB A-</span>
-                <span>CSLB #1140626</span>
+                <span>BBB Accredited</span>
                 <span>GAF Certified</span>
+                <span>Yelp Verified</span>
+                <span>Google Reviews</span>
+                <span>12 Years Experience</span>
                 <span>150+ Reviews</span>
             </div>
 
@@ -78,7 +138,9 @@ function golem_mobile_nav_render(): void {
     @media (min-width: 768px) {
         .golem-hamburger,
         .golem-nav-drawer,
-        .golem-nav-backdrop {
+        .golem-nav-backdrop,
+        .golem-mobile-brand,
+        .golem-mobile-quick {
             display: none !important;
         }
     }
@@ -88,6 +150,24 @@ function golem_mobile_nav_render(): void {
         body {
             max-width: 100%;
             overflow-x: hidden;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        .aux-fs-popup,
+        .aux-fs-menu,
+        .aux-fs-menu *,
+        .aux-fs-popup *,
+        .aux-burger-box,
+        .aux-burger,
+        .aux-nav-menu-element .aux-burger {
+            display: none !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
         }
 
         .elementor-location-header {
@@ -103,14 +183,67 @@ function golem_mobile_nav_render(): void {
         }
 
         .elementor-location-header .elementor-element-5f97dbf {
-            min-width: 220px;
+            min-width: 118px;
         }
 
         .elementor-location-header img {
-            max-height: 42px !important;
+            max-height: 34px !important;
             width: auto !important;
             filter: brightness(0) invert(1);
             opacity: 0.92;
+        }
+
+        .golem-mobile-brand {
+            color: #ffffff !important;
+            display: block !important;
+            left: 70px;
+            max-width: 120px;
+            position: fixed;
+            text-decoration: none !important;
+            top: 17px;
+            z-index: 10001;
+        }
+
+        .golem-mobile-brand__name {
+            display: block;
+            font-family: "Red Hat Display", Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 0;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .golem-mobile-brand__tag {
+            color: rgba(255, 255, 255, 0.68);
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-top: 4px;
+            white-space: nowrap;
+        }
+
+        .golem-mobile-quick {
+            display: flex !important;
+            gap: 6px;
+            position: fixed;
+            right: 64px;
+            top: 20px;
+            z-index: 10001;
+        }
+
+        .golem-mobile-quick a {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            color: #ffffff !important;
+            font-family: "Red Hat Display", Arial, sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1;
+            padding: 9px 10px;
+            text-decoration: none !important;
         }
 
         .elementor-location-header .elementor-widget-text-editor,
@@ -180,12 +313,13 @@ function golem_mobile_nav_render(): void {
             color: #ffffff !important;
             max-width: 320px !important;
             overflow-y: auto !important;
+            overscroll-behavior: contain;
             position: fixed !important;
             right: 0 !important;
             top: 0 !important;
             transform: translateX(100%);
             transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-            width: min(82vw, 320px) !important;
+            width: min(92vw, 320px) !important;
             z-index: 10002 !important;
         }
 
@@ -196,9 +330,9 @@ function golem_mobile_nav_render(): void {
         .golem-nav-drawer__inner {
             display: flex;
             flex-direction: column;
-            gap: 22px;
+            gap: 13px;
             min-height: 100%;
-            padding: 24px 22px 26px;
+            padding: 18px 18px 18px;
         }
 
         .golem-nav-drawer__top {
@@ -238,53 +372,101 @@ function golem_mobile_nav_render(): void {
             color: #ffffff;
             cursor: pointer;
             font-size: 24px;
-            height: 38px;
+            height: 38px !important;
             line-height: 1;
+            min-width: 38px !important;
+            padding: 0 !important;
             width: 38px;
         }
 
         .golem-nav-drawer__nav {
             display: grid;
-            gap: 2px;
+            gap: 8px;
         }
 
-        .golem-nav-drawer__nav a {
+        .golem-nav-drawer__primary {
+            display: grid;
+            gap: 6px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .golem-nav-drawer__primary a,
+        .golem-nav-group__grid a {
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff !important;
             display: block;
             font-family: "Red Hat Display", Arial, sans-serif;
-            font-size: 19px;
+            font-size: 13px;
             font-weight: 700;
             letter-spacing: 0;
             line-height: 1.2;
-            padding: 13px 0;
+            padding: 9px 0;
             text-decoration: none !important;
+        }
+
+        .golem-nav-group {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 0;
+        }
+
+        .golem-nav-group summary {
+            color: #f5d28b;
+            cursor: pointer;
+            font-family: "Red Hat Display", Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0;
+            list-style: none;
+            padding: 10px 12px;
+        }
+
+        .golem-nav-group summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .golem-nav-group summary::after {
+            content: "+";
+            float: right;
+            font-size: 16px;
+            line-height: 0.85;
+        }
+
+        .golem-nav-group[open] summary::after {
+            content: "-";
+        }
+
+        .golem-nav-group__grid {
+            display: grid;
+            gap: 0 14px;
+            grid-template-columns: 1fr 1fr;
+            padding: 0 12px 10px;
         }
 
         .golem-nav-drawer__proof {
             display: grid;
-            gap: 8px;
-            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            grid-template-columns: 1fr 1fr 1fr;
         }
 
         .golem-nav-drawer__proof span {
             border: 1px solid rgba(244, 168, 35, 0.34);
-            border-radius: 8px;
+            border-radius: 7px;
             color: #f5d28b;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 700;
             line-height: 1.2;
-            min-height: 40px;
-            padding: 8px 9px;
+            min-height: 34px;
+            padding: 6px 7px;
         }
 
         .golem-nav-drawer__contact {
             border-top: 1px solid rgba(255, 255, 255, 0.12);
             color: rgba(255, 255, 255, 0.74);
             display: grid;
-            font-size: 14px;
-            gap: 8px;
-            padding-top: 18px;
+            font-size: 12px;
+            gap: 5px;
+            padding-top: 10px;
         }
 
         .golem-nav-drawer__contact a {
@@ -293,13 +475,13 @@ function golem_mobile_nav_render(): void {
         }
 
         .golem-nav-drawer__phone {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 800;
         }
 
         .golem-nav-drawer__cta {
             background: #f4a823;
-            border-radius: 8px;
+            border-radius: 9px;
             box-shadow: 0 14px 34px rgba(244, 168, 35, 0.24);
             color: #151515 !important;
             display: block;
@@ -307,8 +489,8 @@ function golem_mobile_nav_render(): void {
             font-size: 16px;
             font-weight: 900;
             letter-spacing: 0;
-            margin-top: auto;
-            padding: 16px 18px;
+            margin-top: 0;
+            padding: 13px 16px;
             text-align: center;
             text-decoration: none !important;
         }
@@ -319,7 +501,8 @@ function golem_mobile_nav_render(): void {
         }
 
         #about .elementor-element-25007a9 {
-            padding-bottom: 170px !important;
+            margin-bottom: 42px !important;
+            padding-bottom: 210px !important;
             z-index: 5;
         }
 
@@ -332,7 +515,35 @@ function golem_mobile_nav_render(): void {
 
         #about + .elementor-element,
         #about + section {
-            margin-top: 0 !important;
+            margin-top: 18px !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        .elementor-section,
+        .elementor-container,
+        .elementor-column,
+        .elementor-widget-wrap {
+            max-width: 100% !important;
+        }
+
+        @media (max-width: 360px) {
+            .golem-mobile-brand {
+                left: 64px;
+                max-width: 104px;
+            }
+
+            .golem-mobile-brand__name {
+                font-size: 13px;
+            }
+
+            .golem-mobile-brand__tag {
+                font-size: 9px;
+            }
+
+            .golem-mobile-quick a:first-child {
+                display: none !important;
+            }
         }
     }
     </style>
@@ -349,6 +560,14 @@ function golem_mobile_nav_render(): void {
         if (!btn || !drawer || !backdrop) {
             return;
         }
+
+        document.querySelectorAll('.aux-burger, .aux-burger-box, .aux-fs-popup').forEach(function(el) {
+            el.setAttribute('aria-hidden', 'true');
+            el.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }, true);
+        });
 
         function setOpen(isOpen) {
             if (isOpen) {
