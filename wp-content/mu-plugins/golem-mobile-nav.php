@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Mobile Nav
  * Description: Mobile header polish, compact drawer navigation, and first-screen overlap fixes.
- * Version: 2.1.0
+ * Version: 2.1.1
  * Author: Golem Roofing Dev
  */
 
@@ -591,8 +591,31 @@ function golem_mobile_nav_render(): void {
         }
 
         #about {
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.28)),
+                url("https://golemroofing.com/wp-content/uploads/2025/08/0807-poster.webp") center center / cover no-repeat !important;
             overflow: visible !important;
             z-index: 2;
+        }
+
+        #about .elementor-background-video-container {
+            background: url("https://golemroofing.com/wp-content/uploads/2025/08/0807-poster.webp") center center / cover no-repeat !important;
+        }
+
+        #about .elementor-background-video-container,
+        #about .elementor-background-video-hosted {
+            inset: 0 !important;
+            height: 100% !important;
+            min-height: 100% !important;
+            opacity: 1 !important;
+            position: absolute !important;
+            visibility: visible !important;
+            width: 100% !important;
+        }
+
+        #about .elementor-background-video-hosted {
+            object-fit: cover !important;
+            transform: none !important;
         }
 
         #about .elementor-element-25007a9 {
@@ -626,10 +649,6 @@ function golem_mobile_nav_render(): void {
             transition: none !important;
         }
 
-        .home main .elementor-motion-effects-container {
-            display: none !important;
-        }
-
         #bbb-badge {
             display: none !important;
             visibility: hidden !important;
@@ -637,18 +656,50 @@ function golem_mobile_nav_render(): void {
 
         .home #about + .elementor-element,
         .home #about + section {
-            margin-left: 12px !important;
-            margin-right: 12px !important;
-            margin-top: -28px !important;
-            width: calc(100% - 24px) !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            margin-top: -34px !important;
+            width: 100% !important;
         }
 
         .home #about + .elementor-element .elementor-element-e4a410b,
         .home #about + section .elementor-element-e4a410b,
         .home #about + .elementor-element .elementor-element-9c4675b,
         .home #about + section .elementor-element-9c4675b {
-            border-radius: 18px !important;
+            border-radius: 18px 18px 0 0 !important;
             overflow: hidden !important;
+        }
+
+        .home .elementor-element-a526c99,
+        .home .elementor-element-d43fd50 {
+            background: #1150a6 !important;
+        }
+
+        .home .elementor-element-a526c99 {
+            margin-top: 0 !important;
+        }
+
+        .home .elementor-element-d43fd50 {
+            padding-top: 34px !important;
+            padding-bottom: 34px !important;
+        }
+
+        .home .elementor-element-d7942bf,
+        .home .elementor-element-d7942bf .aux-modern-heading-primary,
+        .home .elementor-element-d7942bf .aux-head-highlight {
+            color: #d6e6ff !important;
+        }
+
+        .home .elementor-element-0fa9014 {
+            gap: 18px !important;
+        }
+
+        .home .elementor-element-0fa9014 > .e-con,
+        .home .elementor-element-a2698b1,
+        .home .elementor-element-950bb2d {
+            box-shadow: none !important;
+            max-width: 390px !important;
+            width: calc(100vw - 40px) !important;
         }
 
         .home .elementor-element-641fd80 {
@@ -728,6 +779,67 @@ function golem_mobile_nav_render(): void {
         .elementor-column,
         .elementor-widget-wrap {
             max-width: 100% !important;
+        }
+
+        .elementor-location-footer {
+            background: #1e1d23 !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        .elementor-location-footer + .gc-seo-links-footer,
+        .gc-seo-links-footer {
+            background: #1e1d23 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+            margin-top: 0 !important;
+            padding: 24px 20px 30px !important;
+        }
+
+        .gc-seo-links-footer .gc-cols {
+            display: grid !important;
+            gap: 22px 18px !important;
+            grid-template-columns: 1fr 1fr !important;
+            margin: 0 auto !important;
+            max-width: 430px !important;
+            width: 100% !important;
+        }
+
+        .gc-seo-links-footer h4 {
+            color: #ffffff !important;
+            font-family: "Red Hat Display", Arial, sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 900 !important;
+            letter-spacing: 0.04em !important;
+            line-height: 1.25 !important;
+            margin: 0 0 12px !important;
+            text-transform: uppercase !important;
+        }
+
+        .gc-seo-links-footer ul {
+            list-style: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .gc-seo-links-footer li {
+            margin: 0 0 8px !important;
+            padding: 0 !important;
+        }
+
+        .gc-seo-links-footer a {
+            color: rgba(255, 255, 255, 0.84) !important;
+            font-family: "Red Hat Display", Arial, sans-serif !important;
+            font-size: 12px !important;
+            line-height: 1.25 !important;
+            text-decoration: none !important;
+        }
+
+        .gc-seo-links-footer p {
+            color: rgba(255, 255, 255, 0.58) !important;
+            font-size: 11px !important;
+            grid-column: 1 / -1 !important;
+            line-height: 1.45 !important;
+            margin: 4px 0 0 !important;
         }
 
         @media (max-width: 360px) {
