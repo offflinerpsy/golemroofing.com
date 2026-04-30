@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Mobile Nav
  * Description: Mobile header polish, compact drawer navigation, and first-screen overlap fixes.
- * Version: 2.1.3
+ * Version: 2.1.5
  * Author: Golem Roofing Dev
  */
 
@@ -62,6 +62,8 @@ function golem_mobile_nav_render(): void {
     $bbb_url      = 'https://seal-blue.bbb.org/badge/badge.png';
     ?>
     <!-- GOLEM-MOBILE-NAV -->
+    <div class="golem-mobile-header-shell" aria-hidden="true"></div>
+
     <a class="golem-mobile-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="Golem Roofing home">
         <img class="golem-mobile-brand__mark" src="<?php echo esc_url( $mark_url ); ?>" alt="" aria-hidden="true" loading="eager">
         <img class="golem-mobile-brand__wordmark" src="<?php echo esc_url( $wordmark_url ); ?>" alt="Golem Roofing — Power You Can Trust" loading="eager">
@@ -219,15 +221,40 @@ function golem_mobile_nav_render(): void {
         }
 
         .elementor-location-header {
+            background: transparent !important;
+            background-color: transparent !important;
+            border-bottom: 0 !important;
+            box-shadow: none !important;
+            overflow: visible !important;
             position: sticky !important;
             top: 0 !important;
             z-index: 9999 !important;
             min-height: 70px !important;
-            background: rgba(20, 86, 121, 0.96) !important;
+            transition: min-height 0.22s ease;
+        }
+
+        .elementor-location-header.golem-mobile-header--scrolled {
+            min-height: 62px !important;
+        }
+
+        .golem-mobile-header-shell {
+            background: rgba(20, 86, 121, 0.94) !important;
+            border-bottom: 1px solid rgba(244, 168, 35, 0.28) !important;
+            box-shadow: 0 12px 30px rgba(10, 37, 55, 0.24) !important;
             -webkit-backdrop-filter: blur(14px) saturate(120%);
             backdrop-filter: blur(14px) saturate(120%);
-            border-bottom: 1px solid rgba(244, 168, 35, 0.28);
-            box-shadow: 0 12px 30px rgba(10, 37, 55, 0.24);
+            height: 92px;
+            inset: 0 0 auto 0;
+            pointer-events: none;
+            position: fixed;
+            transition: background 0.22s ease, box-shadow 0.22s ease, height 0.22s ease;
+            z-index: 10000;
+        }
+
+        .golem-mobile-header-shell.golem-mobile-header-shell--scrolled {
+            background: rgba(20, 86, 121, 0.88) !important;
+            box-shadow: 0 10px 24px rgba(10, 37, 55, 0.2) !important;
+            height: 72px;
         }
 
         .elementor-location-header .elementor-element-5f97dbf {
@@ -245,37 +272,40 @@ function golem_mobile_nav_render(): void {
             align-items: center;
             color: #ffffff !important;
             display: flex !important;
-            gap: 8px;
+            gap: 10px;
             left: 18px;
-            max-width: 198px;
+            max-width: 210px;
             position: fixed;
             text-decoration: none !important;
-            top: 12px;
+            top: 11px;
+            transition: top 0.22s ease, transform 0.22s ease;
             z-index: 10001;
         }
 
         .golem-mobile-brand__mark {
             display: block;
             height: auto;
-            max-height: 34px;
-            width: 54px;
+            max-height: 36px;
+            width: 58px;
         }
 
         .golem-mobile-brand__wordmark {
             display: block;
             filter: brightness(0) invert(1);
             height: auto;
-            max-height: 30px;
+            max-height: 34px;
             opacity: 0.96;
-            width: 128px;
+            width: 142px;
         }
 
         .golem-mobile-quick {
+            align-items: center;
             display: flex !important;
-            gap: 14px;
+            gap: 16px;
             position: fixed;
-            right: 70px;
-            top: 27px;
+            right: 64px;
+            top: 33px;
+            transition: top 0.22s ease, transform 0.22s ease;
             z-index: 10001;
         }
 
@@ -289,6 +319,7 @@ function golem_mobile_nav_render(): void {
             line-height: 1;
             padding: 0;
             text-decoration: none !important;
+            transition: opacity 0.22s ease;
         }
 
         .elementor-location-header .elementor-widget-text-editor,
@@ -313,8 +344,21 @@ function golem_mobile_nav_render(): void {
             position: fixed !important;
             right: 14px !important;
             top: 14px !important;
+            transition: top 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
             width: 42px !important;
             z-index: 10001 !important;
+        }
+
+        .golem-mobile-brand.golem-mobile-brand--scrolled {
+            top: 8px;
+        }
+
+        .golem-mobile-quick.golem-mobile-quick--scrolled {
+            top: 26px;
+        }
+
+        .golem-hamburger.golem-hamburger--scrolled {
+            top: 10px !important;
         }
 
         .golem-hamburger__line {
@@ -604,8 +648,13 @@ function golem_mobile_nav_render(): void {
             background:
                 linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.28)),
                 url("https://golemroofing.com/wp-content/uploads/2025/08/0807-poster.webp") center center / cover no-repeat !important;
+            min-height: calc(100svh - 92px) !important;
             overflow: visible !important;
             z-index: 2;
+        }
+
+        #about > .e-con-inner {
+            min-height: calc(100svh - 92px) !important;
         }
 
         #about .elementor-background-video-container {
@@ -629,9 +678,42 @@ function golem_mobile_nav_render(): void {
         }
 
         #about .elementor-element-25007a9 {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
             margin-bottom: 0 !important;
-            padding-bottom: 142px !important;
+            min-height: calc(100svh - 92px) !important;
+            padding-bottom: 32px !important;
+            padding-top: clamp(34px, 8svh, 92px) !important;
             z-index: 5;
+        }
+
+        #about .elementor-element-ba0b2de {
+            margin-bottom: 28px !important;
+        }
+
+        #about .elementor-element-ba0b2de .aux-modern-heading-primary {
+            font-size: 17px !important;
+            line-height: 1.45 !important;
+            margin-bottom: 8px !important;
+        }
+
+        #about .elementor-element-ba0b2de .aux-modern-heading-secondary,
+        #about .elementor-element-ba0b2de .aux-head-before {
+            font-size: 36px !important;
+            line-height: 1.05 !important;
+        }
+
+        #about .elementor-element-ba0b2de .aux-modern-heading-description,
+        #about .elementor-element-ba0b2de .aux-modern-heading-description p,
+        #about .elementor-element-ba0b2de .aux-modern-heading-description span {
+            font-size: 16px !important;
+            line-height: 1.55 !important;
+        }
+
+        #about .elementor-element-f7b278e {
+            margin-top: auto !important;
+            padding-bottom: 0 !important;
         }
 
         #about .elementor-element-f7b278e,
@@ -639,6 +721,15 @@ function golem_mobile_nav_render(): void {
         #about .aux-modern-button {
             position: relative;
             z-index: 6;
+        }
+
+        #about .aux-modern-button-wrapper {
+            width: 100% !important;
+        }
+
+        #about .aux-modern-button {
+            margin-left: 0 !important;
+            width: min(100%, calc(100vw - 64px)) !important;
         }
 
         #about + .elementor-element,
@@ -717,8 +808,11 @@ function golem_mobile_nav_render(): void {
         .home .elementor-element-0fa9014 > .e-con,
         .home .elementor-element-a2698b1,
         .home .elementor-element-950bb2d {
+            align-self: center !important;
             box-shadow: none !important;
-            max-width: 390px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            max-width: min(390px, calc(100vw - 40px)) !important;
             width: calc(100vw - 40px) !important;
         }
 
@@ -807,6 +901,53 @@ function golem_mobile_nav_render(): void {
             padding-bottom: 0 !important;
         }
 
+        .elementor-location-footer .aux-modern-button-wrapper {
+            display: flex !important;
+            justify-content: center !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+
+        .elementor-location-footer .aux-modern-button {
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        .dialog-widget.dialog-lightbox-widget.dialog-type-lightbox.elementor-popup-modal {
+            align-items: flex-start !important;
+            padding: 0 16px 24px !important;
+            z-index: 20000 !important;
+        }
+
+        .dialog-widget.dialog-lightbox-widget.dialog-type-lightbox.elementor-popup-modal .dialog-widget-content {
+            left: auto !important;
+            margin: 0 auto !important;
+            max-height: calc(100svh - env(safe-area-inset-top, 0px) - 44px) !important;
+            overflow-y: auto !important;
+            top: calc(env(safe-area-inset-top, 0px) + 22px) !important;
+            transform: none !important;
+            width: min(100%, 360px) !important;
+        }
+
+        .dialog-widget.dialog-lightbox-widget.dialog-type-lightbox.elementor-popup-modal .dialog-message {
+            max-height: inherit !important;
+            overflow: visible !important;
+        }
+
+        .dialog-widget.dialog-lightbox-widget.dialog-type-lightbox.elementor-popup-modal .dialog-close-button {
+            right: 14px !important;
+            top: 14px !important;
+        }
+
+        body.dialog-lightbox-body .golem-mobile-header-shell,
+        body.dialog-lightbox-body .golem-mobile-brand,
+        body.dialog-lightbox-body .golem-mobile-quick,
+        body.dialog-lightbox-body .golem-hamburger {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+
         .elementor-location-footer + .gc-seo-links-footer,
         .gc-seo-links-footer {
             background: #1e1d23 !important;
@@ -862,22 +1003,109 @@ function golem_mobile_nav_render(): void {
             margin: 4px 0 0 !important;
         }
 
+        .gc-seo-links-footer .gc-cols.golem-footer-accordion {
+            display: grid !important;
+            gap: 10px !important;
+            grid-template-columns: 1fr !important;
+            max-width: 430px !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__item {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__summary {
+            color: #ffffff !important;
+            cursor: pointer;
+            font-family: "Red Hat Display", Arial, sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 900 !important;
+            letter-spacing: 0.04em !important;
+            line-height: 1.2 !important;
+            list-style: none !important;
+            margin: 0 !important;
+            padding: 13px 16px !important;
+            position: relative;
+            text-transform: uppercase !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__summary::-webkit-details-marker {
+            display: none !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__summary::after {
+            color: #f4a823 !important;
+            content: "+";
+            font-size: 18px !important;
+            font-weight: 900 !important;
+            line-height: 1 !important;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__item[open] .golem-footer-accordion__summary::after {
+            content: "−";
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__body {
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            padding: 0 16px 16px !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__body ul {
+            margin-top: 12px !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__body li {
+            margin-bottom: 10px !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__body a {
+            font-size: 13px !important;
+            line-height: 1.35 !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__body .gc-trust-badges {
+            display: grid !important;
+            gap: 8px !important;
+            margin-top: 14px !important;
+        }
+
+        .gc-seo-links-footer .golem-footer-accordion__body .gc-trust-badges a {
+            margin: 0 !important;
+            text-align: center !important;
+        }
+
         @media (max-width: 360px) {
             .golem-mobile-brand {
                 left: 14px;
-                max-width: 160px;
+                max-width: 170px;
             }
 
             .golem-mobile-brand__mark {
-                width: 46px;
+                width: 50px;
             }
 
             .golem-mobile-brand__wordmark {
-                width: 104px;
+                width: 116px;
             }
 
             .golem-mobile-quick a:first-child {
                 display: none !important;
+            }
+
+            #about .elementor-element-ba0b2de .aux-modern-heading-primary {
+                font-size: 16px !important;
+            }
+
+            #about .elementor-element-ba0b2de .aux-modern-heading-secondary,
+            #about .elementor-element-ba0b2de .aux-head-before {
+                font-size: 34px !important;
             }
         }
     }
@@ -891,6 +1119,7 @@ function golem_mobile_nav_render(): void {
         var drawer = document.getElementById('golem-nav-drawer');
         var backdrop = document.getElementById('golem-nav-backdrop');
         var closeBtn = document.getElementById('golem-nav-close');
+        var mobileMedia = window.matchMedia('(max-width: 767px)');
 
         if (!btn || !drawer || !backdrop) {
             return;
@@ -922,6 +1151,77 @@ function golem_mobile_nav_render(): void {
 
             homeTrustGrid.appendChild(bbbCard);
             homeTrustGrid.appendChild(yearsCard);
+        }
+
+        function syncHeaderState() {
+            var header = document.querySelector('.elementor-location-header');
+            var shell = document.querySelector('.golem-mobile-header-shell');
+            var brand = document.querySelector('.golem-mobile-brand');
+            var quick = document.querySelector('.golem-mobile-quick');
+            if (!header || !mobileMedia.matches) {
+                return;
+            }
+
+            var isScrolled = window.scrollY > 18;
+            header.classList.toggle('golem-mobile-header--scrolled', isScrolled);
+            btn.classList.toggle('golem-hamburger--scrolled', isScrolled);
+
+            if (shell) {
+                shell.classList.toggle('golem-mobile-header-shell--scrolled', isScrolled);
+            }
+
+            if (brand) {
+                brand.classList.toggle('golem-mobile-brand--scrolled', isScrolled);
+            }
+
+            if (quick) {
+                quick.classList.toggle('golem-mobile-quick--scrolled', isScrolled);
+            }
+        }
+
+        function buildFooterAccordion() {
+            if (!mobileMedia.matches) {
+                return;
+            }
+
+            var footerCols = document.querySelector('.gc-seo-links-footer .gc-cols');
+            if (!footerCols || footerCols.classList.contains('golem-footer-accordion')) {
+                return;
+            }
+
+            var sections = Array.prototype.slice.call(footerCols.children);
+            sections.forEach(function(section) {
+                if (!(section instanceof HTMLElement)) {
+                    return;
+                }
+
+                var heading = section.querySelector('h4');
+                if (!heading) {
+                    return;
+                }
+
+                var details = document.createElement('details');
+                details.className = 'golem-footer-accordion__item';
+
+                var summary = document.createElement('summary');
+                summary.className = 'golem-footer-accordion__summary';
+                summary.textContent = heading.textContent.trim();
+
+                var body = document.createElement('div');
+                body.className = 'golem-footer-accordion__body';
+
+                Array.prototype.slice.call(section.children).forEach(function(child) {
+                    if (child !== heading) {
+                        body.appendChild(child);
+                    }
+                });
+
+                details.appendChild(summary);
+                details.appendChild(body);
+                footerCols.replaceChild(details, section);
+            });
+
+            footerCols.classList.add('golem-footer-accordion');
         }
 
         function setOpen(isOpen) {
@@ -978,11 +1278,20 @@ function golem_mobile_nav_render(): void {
             }
         });
 
+        mobileMedia.addEventListener('change', function() {
+            syncHeaderState();
+            buildFooterAccordion();
+        });
+
         window.matchMedia('(min-width: 768px)').addEventListener('change', function(event) {
             if (event.matches && !drawer.hasAttribute('hidden')) {
                 setOpen(false);
             }
         });
+
+        window.addEventListener('scroll', syncHeaderState, { passive: true });
+        syncHeaderState();
+        buildFooterAccordion();
     })();
     </script>
     <!-- /GOLEM-MOBILE-NAV -->
