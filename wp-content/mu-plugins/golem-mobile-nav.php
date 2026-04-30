@@ -27,23 +27,34 @@ function golem_mobile_nav_fix_experience_years( string $html ): string {
             'With over 8 years of hands-on experience',
             'over 8 years of hands-on experience',
             'over 8 years',
+            '8+ Years of Roofing Experience',
+            '8+ years of roofing experience',
+            '8+ Years Experience',
+            '8+ years experience',
         ),
         array(
             'With over 12 years of hands-on experience',
             'over 12 years of hands-on experience',
             'over 12 years',
+            '12 Years of Roofing Experience',
+            '12 years of roofing experience',
+            '12 Years Experience',
+            '12 years experience',
         ),
         $html
     );
 }
 
 function golem_mobile_nav_render(): void {
-    $quote_url = home_url( '/?quote=1' );
+    $quote_url    = home_url( '/?quote=1' );
+    $mark_url     = 'https://golemroofing.com/wp-content/uploads/2025/08/7bf0ac983262c3171f71cc5a0495567e.webp';
+    $wordmark_url = 'https://golemroofing.com/wp-content/uploads/2020/10/00d5a08bd910c0f7830e1acc9f8c2a6a.webp';
+    $bbb_url      = 'https://seal-blue.bbb.org/badge/badge.png';
     ?>
     <!-- GOLEM-MOBILE-NAV -->
     <a class="golem-mobile-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="Golem Roofing home">
-        <span class="golem-mobile-brand__name">Golem Roofing</span>
-        <span class="golem-mobile-brand__tag">12 years experience</span>
+        <img class="golem-mobile-brand__mark" src="<?php echo esc_url( $mark_url ); ?>" alt="" aria-hidden="true" loading="eager">
+        <img class="golem-mobile-brand__wordmark" src="<?php echo esc_url( $wordmark_url ); ?>" alt="Golem Roofing — Power You Can Trust" loading="eager">
     </a>
 
     <nav class="golem-mobile-quick" aria-label="Quick mobile links">
@@ -77,8 +88,8 @@ function golem_mobile_nav_render(): void {
         <div class="golem-nav-drawer__inner">
             <div class="golem-nav-drawer__top">
                 <a class="golem-nav-drawer__brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-                    <span class="golem-nav-drawer__brand-title">Golem Roofing</span>
-                    <span class="golem-nav-drawer__brand-subtitle">Power You Can Trust</span>
+                    <img class="golem-nav-drawer__brand-mark" src="<?php echo esc_url( $mark_url ); ?>" alt="" aria-hidden="true">
+                    <img class="golem-nav-drawer__brand-wordmark" src="<?php echo esc_url( $wordmark_url ); ?>" alt="Golem Roofing — Power You Can Trust">
                 </a>
                 <button id="golem-nav-close" class="golem-nav-drawer__close" aria-label="Close navigation menu" type="button">×</button>
             </div>
@@ -115,13 +126,25 @@ function golem_mobile_nav_render(): void {
                 </details>
             </nav>
 
-            <div class="golem-nav-drawer__proof" aria-label="Trust signals">
-                <span>BBB Accredited</span>
-                <span>GAF Certified</span>
-                <span>Yelp Verified</span>
-                <span>Google Reviews</span>
-                <span>12 Years Experience</span>
-                <span>150+ Reviews</span>
+            <div class="golem-nav-drawer__proof" aria-label="Trust signals and review badges">
+                <span class="golem-proof-card golem-proof-card--bbb">
+                    <img class="golem-proof-bbb-img" src="<?php echo esc_url( $bbb_url ); ?>" alt="BBB Accredited Business" loading="lazy">
+                </span>
+                <span class="golem-proof-card golem-proof-card--gaf">
+                    <strong>GAF</strong><em>Certified</em>
+                </span>
+                <span class="golem-proof-card golem-proof-card--google">
+                    <strong>Google</strong><em>★★★★★</em>
+                </span>
+                <span class="golem-proof-card golem-proof-card--yelp">
+                    <strong>Yelp</strong><em>Verified</em>
+                </span>
+                <span class="golem-proof-card golem-proof-card--years">
+                    <strong>12</strong><em>Years Experience</em>
+                </span>
+                <span class="golem-proof-card golem-proof-card--reviews">
+                    <strong>150+</strong><em>Verified Reviews</em>
+                </span>
             </div>
 
             <div class="golem-nav-drawer__contact">
@@ -164,9 +187,21 @@ function golem_mobile_nav_render(): void {
         .aux-fs-popup *,
         .aux-burger-box,
         .aux-burger,
-        .aux-nav-menu-element .aux-burger {
+        .aux-nav-menu-element .aux-burger,
+        .elementor-location-header .aux-widget-logo,
+        .elementor-location-header .aux-logo-text,
+        .elementor-location-header .aux-elementor-header-menu,
+        .elementor-location-header .elementor-widget-aux_logo,
+        .elementor-location-header .elementor-widget-aux_menu_box,
+        .elementor-location-header .elementor-widget-image,
+        .elementor-location-header nav {
             display: none !important;
             pointer-events: none !important;
+            visibility: hidden !important;
+        }
+
+        img[src*="seal-blue.bbb.org"]:not(.golem-proof-bbb-img) {
+            display: none !important;
             visibility: hidden !important;
         }
 
@@ -174,12 +209,12 @@ function golem_mobile_nav_render(): void {
             position: sticky !important;
             top: 0 !important;
             z-index: 9999 !important;
-            min-height: 72px !important;
-            background: rgba(30, 29, 35, 0.76) !important;
-            -webkit-backdrop-filter: blur(16px) saturate(130%);
-            backdrop-filter: blur(16px) saturate(130%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+            min-height: 70px !important;
+            background: rgba(20, 86, 121, 0.96) !important;
+            -webkit-backdrop-filter: blur(14px) saturate(120%);
+            backdrop-filter: blur(14px) saturate(120%);
+            border-bottom: 1px solid rgba(244, 168, 35, 0.28);
+            box-shadow: 0 12px 30px rgba(10, 37, 55, 0.24);
         }
 
         .elementor-location-header .elementor-element-5f97dbf {
@@ -194,55 +229,52 @@ function golem_mobile_nav_render(): void {
         }
 
         .golem-mobile-brand {
+            align-items: center;
             color: #ffffff !important;
-            display: block !important;
-            left: 70px;
-            max-width: 120px;
+            display: flex !important;
+            gap: 8px;
+            left: 18px;
+            max-width: 198px;
             position: fixed;
             text-decoration: none !important;
-            top: 17px;
+            top: 12px;
             z-index: 10001;
         }
 
-        .golem-mobile-brand__name {
+        .golem-mobile-brand__mark {
             display: block;
-            font-family: "Red Hat Display", Arial, sans-serif;
-            font-size: 15px;
-            font-weight: 900;
-            letter-spacing: 0;
-            line-height: 1;
-            white-space: nowrap;
+            height: auto;
+            max-height: 34px;
+            width: 54px;
         }
 
-        .golem-mobile-brand__tag {
-            color: rgba(255, 255, 255, 0.68);
+        .golem-mobile-brand__wordmark {
             display: block;
-            font-size: 10px;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-top: 4px;
-            white-space: nowrap;
+            filter: brightness(0) invert(1);
+            height: auto;
+            max-height: 30px;
+            opacity: 0.96;
+            width: 128px;
         }
 
         .golem-mobile-quick {
             display: flex !important;
-            gap: 6px;
+            gap: 14px;
             position: fixed;
-            right: 64px;
-            top: 20px;
+            right: 70px;
+            top: 27px;
             z-index: 10001;
         }
 
         .golem-mobile-quick a {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 999px;
-            color: #ffffff !important;
+            background: transparent;
+            border: 0;
+            color: #f4a823 !important;
             font-family: "Red Hat Display", Arial, sans-serif;
-            font-size: 11px;
-            font-weight: 800;
+            font-size: 13px;
+            font-weight: 900;
             line-height: 1;
-            padding: 9px 10px;
+            padding: 0;
             text-decoration: none !important;
         }
 
@@ -254,9 +286,10 @@ function golem_mobile_nav_render(): void {
 
         .golem-hamburger {
             align-items: center;
-            background: rgba(255, 255, 255, 0.08) !important;
-            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            background: #f4a823 !important;
+            border: 1px solid rgba(255, 255, 255, 0.28) !important;
             border-radius: 999px !important;
+            box-shadow: 0 10px 24px rgba(244, 168, 35, 0.24);
             cursor: pointer;
             display: flex !important;
             flex-direction: column;
@@ -266,13 +299,13 @@ function golem_mobile_nav_render(): void {
             padding: 0 !important;
             position: fixed !important;
             right: 14px !important;
-            top: 15px !important;
+            top: 14px !important;
             width: 42px !important;
             z-index: 10001 !important;
         }
 
         .golem-hamburger__line {
-            background: #ffffff !important;
+            background: #145679 !important;
             border-radius: 999px !important;
             display: block !important;
             height: 2px !important;
@@ -344,25 +377,27 @@ function golem_mobile_nav_render(): void {
 
         .golem-nav-drawer__brand,
         .golem-nav-drawer__brand:hover {
+            align-items: center;
             color: #ffffff !important;
+            display: flex;
+            gap: 10px;
             text-decoration: none !important;
         }
 
-        .golem-nav-drawer__brand-title {
+        .golem-nav-drawer__brand-mark {
             display: block;
-            font-family: "Red Hat Display", Arial, sans-serif;
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 0;
-            line-height: 1.1;
+            height: auto;
+            max-height: 42px;
+            width: 68px;
         }
 
-        .golem-nav-drawer__brand-subtitle {
-            color: rgba(255, 255, 255, 0.68);
+        .golem-nav-drawer__brand-wordmark {
             display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 4px;
+            filter: brightness(0) invert(1);
+            height: auto;
+            max-height: 38px;
+            opacity: 0.96;
+            width: 150px;
         }
 
         .golem-nav-drawer__close {
@@ -445,19 +480,76 @@ function golem_mobile_nav_render(): void {
 
         .golem-nav-drawer__proof {
             display: grid;
-            gap: 6px;
-            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            grid-template-columns: 1fr 1fr;
         }
 
-        .golem-nav-drawer__proof span {
-            border: 1px solid rgba(244, 168, 35, 0.34);
-            border-radius: 7px;
-            color: #f5d28b;
-            font-size: 10px;
-            font-weight: 700;
+        .golem-proof-card {
+            align-items: center;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(244, 168, 35, 0.32);
+            border-radius: 8px;
+            color: #145679;
+            display: flex;
+            flex-direction: column;
+            font-family: "Red Hat Display", Arial, sans-serif;
+            justify-content: center;
             line-height: 1.2;
-            min-height: 34px;
-            padding: 6px 7px;
+            min-height: 48px;
+            overflow: hidden;
+            padding: 7px 8px;
+            text-align: center;
+        }
+
+        .golem-proof-card strong {
+            display: block;
+            font-size: 16px;
+            font-weight: 950;
+            letter-spacing: 0;
+        }
+
+        .golem-proof-card em {
+            color: #4e5962;
+            display: block;
+            font-size: 10px;
+            font-style: normal;
+            font-weight: 800;
+        }
+
+        .golem-proof-card--bbb {
+            padding: 0;
+        }
+
+        .golem-proof-card--bbb img {
+            display: block;
+            height: 48px;
+            object-fit: contain;
+            width: 100%;
+        }
+
+        .golem-proof-card--gaf strong {
+            color: #d71920;
+        }
+
+        .golem-proof-card--google strong {
+            color: #4285f4;
+            font-size: 15px;
+        }
+
+        .golem-proof-card--google em {
+            color: #f4a823;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .golem-proof-card--yelp strong {
+            color: #d32323;
+        }
+
+        .golem-proof-card--years strong,
+        .golem-proof-card--reviews strong {
+            color: #145679;
+            font-size: 18px;
         }
 
         .golem-nav-drawer__contact {
@@ -501,8 +593,8 @@ function golem_mobile_nav_render(): void {
         }
 
         #about .elementor-element-25007a9 {
-            margin-bottom: 42px !important;
-            padding-bottom: 210px !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 142px !important;
             z-index: 5;
         }
 
@@ -515,7 +607,7 @@ function golem_mobile_nav_render(): void {
 
         #about + .elementor-element,
         #about + section {
-            margin-top: 18px !important;
+            margin-top: -28px !important;
             position: relative;
             z-index: 1;
         }
@@ -529,16 +621,16 @@ function golem_mobile_nav_render(): void {
 
         @media (max-width: 360px) {
             .golem-mobile-brand {
-                left: 64px;
-                max-width: 104px;
+                left: 14px;
+                max-width: 160px;
             }
 
-            .golem-mobile-brand__name {
-                font-size: 13px;
+            .golem-mobile-brand__mark {
+                width: 46px;
             }
 
-            .golem-mobile-brand__tag {
-                font-size: 9px;
+            .golem-mobile-brand__wordmark {
+                width: 104px;
             }
 
             .golem-mobile-quick a:first-child {
