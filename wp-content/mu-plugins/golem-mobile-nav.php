@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Mobile Nav
  * Description: Mobile header polish, compact drawer navigation, and first-screen overlap fixes.
- * Version: 2.1.1
+ * Version: 2.1.2
  * Author: Golem Roofing Dev
  */
 
@@ -668,6 +668,16 @@ function golem_mobile_nav_render(): void {
         .home #about + section .elementor-element-9c4675b {
             border-radius: 18px 18px 0 0 !important;
             overflow: hidden !important;
+        }
+
+        .home #about + .elementor-element .elementor-element-42b5fe7,
+        .home #about + section .elementor-element-42b5fe7 {
+            padding-top: 26px !important;
+        }
+
+        .home #about + .elementor-element .elementor-element-b3659ad,
+        .home #about + section .elementor-element-b3659ad {
+            margin-top: 0 !important;
         }
 
         .home .elementor-element-a526c99,
