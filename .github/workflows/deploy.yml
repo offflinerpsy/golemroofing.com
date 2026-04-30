@@ -1,54 +1,195 @@
-name: 🚀 Deploy to Production
+name: Targeted Production Deploy
 
 on:
   push:
     branches: [main]
+    paths:
+      - "wp-content/mu-plugins/**"
+      - "robots.txt"
   workflow_dispatch:
+    inputs:
+      deploy_scope:
+        description: "What to deploy"
+        required: true
+        default: "single-file"
+        type: choice
+        options:
+          - single-file
+          - changed-files
+          - mu-plugins
+          - robots
+          - all
+          - rollback-file
+      file_path:
+        description: "Required for single-file/rollback-file. Example: wp-content/mu-plugins/golem-mobile-nav.php"
+        required: false
+        default: ""
+        type: string
+      backup_stamp:
+        description: "Required for rollback-file. Example: 20260430T120000Z-abcdef1"
+        required: false
+        default: ""
+        type: string
 
 env:
   SERVER_HOST: 5.78.65.51
   SERVER_USER: root
   DEPLOY_PATH: /home/admin/web/golemroofing.com/public_html
+  BACKUP_ROOT: /home/admin/web/golemroofing.com/deploy-backups
 
 jobs:
   deploy:
-    name: 📦 Deploy WordPress Custom Code
+    name: Deploy selected files
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v4
 
-      - name: 🔑 Setup SSH Key
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ env.SERVER_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: 📤 Deploy mu-plugins
+      - name: Build deploy manifest
+        id: manifest
+        shell: bash
         run: |
-          rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            wp-content/mu-plugins/ \
-            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/wp-content/mu-plugins/
+          set -euo pipefail
 
-      - name: 📤 Deploy robots.txt
+          SCOPE="${{ github.event.inputs.deploy_scope || 'changed-files' }}"
+          FILE_PATH="${{ github.event.inputs.file_path || '' }}"
+          BACKUP_STAMP="${{ github.event.inputs.backup_stamp || '' }}"
+
+          : > deploy-files.txt
+          echo "is_rollback=false" >> "$GITHUB_OUTPUT"
+
+          case "$SCOPE" in
+            single-file)
+              if [ -z "$FILE_PATH" ]; then
+                echo "file_path is required for single-file deploy" >&2
+                exit 1
+              fi
+              printf '%s\n' "$FILE_PATH" > deploy-files.txt
+              ;;
+            rollback-file)
+              if [ -z "$FILE_PATH" ] || [ -z "$BACKUP_STAMP" ]; then
+                echo "file_path and backup_stamp are required for rollback-file" >&2
+                exit 1
+              fi
+              printf '%s\n' "$FILE_PATH" > deploy-files.txt
+              echo "is_rollback=true" >> "$GITHUB_OUTPUT"
+              ;;
+            changed-files)
+              if git rev-parse HEAD^ >/dev/null 2>&1; then
+                git diff --name-only HEAD^ HEAD > changed-files.txt
+              else
+                git diff --name-only HEAD > changed-files.txt
+              fi
+              grep -E '^(wp-content/mu-plugins/[^/]+\.php|robots\.txt)$' changed-files.txt > deploy-files.txt || true
+              ;;
+            mu-plugins)
+              find wp-content/mu-plugins -maxdepth 1 -type f -name '*.php' | sort > deploy-files.txt
+              ;;
+            robots)
+              printf 'robots.txt\n' > deploy-files.txt
+              ;;
+            all)
+              find wp-content/mu-plugins -maxdepth 1 -type f -name '*.php' | sort > deploy-files.txt
+              printf 'robots.txt\n' >> deploy-files.txt
+              ;;
+            *)
+              echo "Unknown deploy_scope: $SCOPE" >&2
+              exit 1
+              ;;
+          esac
+
+          awk '
+            /^wp-content\/mu-plugins\/[^/]+\.php$/ { print; next }
+            /^robots\.txt$/ { print; next }
+            { print "Blocked deploy path: " $0 > "/dev/stderr"; bad=1 }
+            END { exit bad ? 1 : 0 }
+          ' deploy-files.txt > deploy-files.safe.txt
+
+          mv deploy-files.safe.txt deploy-files.txt
+
+          if [ ! -s deploy-files.txt ]; then
+            echo "No allowed files to deploy."
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Files selected for deploy:"
+          cat deploy-files.txt
+          echo "has_files=true" >> "$GITHUB_OUTPUT"
+
+      - name: Backup selected production files
+        if: steps.manifest.outputs.has_files == 'true'
+        shell: bash
         run: |
-          rsync -avz \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            robots.txt \
-            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/robots.txt
+          set -euo pipefail
+          STAMP="$(date -u +%Y%m%dT%H%M%SZ)-${GITHUB_SHA::7}"
+          REMOTE_BACKUP="${{ env.BACKUP_ROOT }}/$STAMP"
 
-      - name: 🧹 Clear WordPress Cache
+          ssh -o StrictHostKeyChecking=no \
+            "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" \
+            "mkdir -p '$REMOTE_BACKUP'"
+
+          while IFS= read -r file; do
+            remote="${{ env.DEPLOY_PATH }}/$file"
+            backup="$REMOTE_BACKUP/$file"
+            ssh -o StrictHostKeyChecking=no \
+              "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" \
+              "mkdir -p \"$(dirname "$backup")\" && if [ -e \"$remote\" ]; then cp -a \"$remote\" \"$backup\"; else printf 'MISSING\n' > \"$backup.__missing\"; fi"
+          done < deploy-files.txt
+
+          echo "Backup created at $REMOTE_BACKUP"
+
+      - name: Roll back selected production file
+        if: steps.manifest.outputs.has_files == 'true' && steps.manifest.outputs.is_rollback == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          BACKUP_STAMP="${{ github.event.inputs.backup_stamp }}"
+
+          while IFS= read -r file; do
+            src="${{ env.BACKUP_ROOT }}/$BACKUP_STAMP/$file"
+            dst="${{ env.DEPLOY_PATH }}/$file"
+            ssh -o StrictHostKeyChecking=no \
+              "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" \
+              "test -e \"$src\" && mkdir -p \"$(dirname "$dst")\" && cp -a \"$src\" \"$dst\""
+          done < deploy-files.txt
+
+      - name: Deploy selected files
+        if: steps.manifest.outputs.has_files == 'true' && steps.manifest.outputs.is_rollback != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r file; do
+            rsync -avz \
+              -e "ssh -o StrictHostKeyChecking=no" \
+              "$file" \
+              "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/$file"
+          done < deploy-files.txt
+
+      - name: Clear WordPress cache
+        if: steps.manifest.outputs.has_files == 'true'
         run: |
           ssh -o StrictHostKeyChecking=no \
-            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} \
-            "cd ${{ env.DEPLOY_PATH }} && wp cache flush --allow-root 2>/dev/null || true"
+            "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" \
+            "cd '${{ env.DEPLOY_PATH }}' && wp cache flush --allow-root 2>/dev/null || true"
 
-      - name: ✅ Deployment Complete
+      - name: Deployment summary
+        shell: bash
         run: |
-          echo "🎉 Successfully deployed to golemroofing.com!"
-          echo "📁 mu-plugins synced"
-          echo "🤖 robots.txt updated"
-          echo "🧹 Cache cleared"
+          if [ -s deploy-files.txt ]; then
+            echo "Deployed files:"
+            cat deploy-files.txt
+          else
+            echo "Nothing deployed."
+          fi
