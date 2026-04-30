@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Mobile Nav
  * Description: Mobile header polish, compact drawer navigation, and first-screen overlap fixes.
- * Version: 2.1.2
+ * Version: 2.1.3
  * Author: Golem Roofing Dev
  */
 
@@ -31,6 +31,11 @@ function golem_mobile_nav_fix_experience_years( string $html ): string {
             '8+ years of roofing experience',
             '8+ Years Experience',
             '8+ years experience',
+            '8+ years of experience',
+            '10 Year Workmanship Warranty',
+            '10-Year Workmanship Warranty',
+            '10-year workmanship warranty',
+            '15-Year Workmanship & 20+ Year Manufacturer Warranties',
         ),
         array(
             'With over 12 years of hands-on experience',
@@ -40,6 +45,11 @@ function golem_mobile_nav_fix_experience_years( string $html ): string {
             '12 years of roofing experience',
             '12 Years Experience',
             '12 years experience',
+            'over 12 years of combined hands-on roofing experience',
+            '12 Year No-Leak Workmanship Warranty',
+            '12-Year No-Leak Workmanship Warranty',
+            '12-year no-leak workmanship warranty',
+            '12-Year No-Leak Workmanship Warranty & Eligible Manufacturer Warranties',
         ),
         $html
     );
@@ -104,24 +114,24 @@ function golem_mobile_nav_render(): void {
                 <details class="golem-nav-group" open>
                     <summary>Services</summary>
                     <div class="golem-nav-group__grid">
-                        <a href="<?php echo esc_url( home_url( '/services/roof-replacement/' ) ); ?>">Replacement</a>
-                        <a href="<?php echo esc_url( home_url( '/services/roof-repair/' ) ); ?>">Repair</a>
-                        <a href="<?php echo esc_url( home_url( '/services/roof-installation/' ) ); ?>">Installation</a>
-                        <a href="<?php echo esc_url( home_url( '/services/flat-roofing/' ) ); ?>">Flat Roofing</a>
-                        <a href="<?php echo esc_url( home_url( '/services/tile-roofing/' ) ); ?>">Tile Roofing</a>
-                        <a href="<?php echo esc_url( home_url( '/services/shingle-roofing/' ) ); ?>">Shingle Roofing</a>
+                        <a href="<?php echo esc_url( home_url( '/roof-replacement/' ) ); ?>">Replacement</a>
+                        <a href="<?php echo esc_url( home_url( '/roof-repair/' ) ); ?>">Repair</a>
+                        <a href="<?php echo esc_url( home_url( '/roof-installation/' ) ); ?>">Installation</a>
+                        <a href="<?php echo esc_url( home_url( '/flat-roof-installation/' ) ); ?>">Flat Roofing</a>
+                        <a href="<?php echo esc_url( home_url( '/tile-roof-installation/' ) ); ?>">Tile Roofing</a>
+                        <a href="<?php echo esc_url( home_url( '/shingle-roof-installation/' ) ); ?>">Shingle Roofing</a>
                     </div>
                 </details>
 
                 <details class="golem-nav-group">
                     <summary>Service Areas</summary>
                     <div class="golem-nav-group__grid">
-                        <a href="<?php echo esc_url( home_url( '/service-areas/long-beach/' ) ); ?>">Long Beach</a>
-                        <a href="<?php echo esc_url( home_url( '/service-areas/seal-beach/' ) ); ?>">Seal Beach</a>
-                        <a href="<?php echo esc_url( home_url( '/service-areas/redondo-beach/' ) ); ?>">Redondo Beach</a>
-                        <a href="<?php echo esc_url( home_url( '/service-areas/manhattan-beach/' ) ); ?>">Manhattan Beach</a>
-                        <a href="<?php echo esc_url( home_url( '/service-areas/hermosa-beach/' ) ); ?>">Hermosa Beach</a>
-                        <a href="<?php echo esc_url( home_url( '/service-areas/palos-verdes-estates/' ) ); ?>">Palos Verdes</a>
+                        <a href="<?php echo esc_url( home_url( '/roofing-long-beach-ca/' ) ); ?>">Long Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/roofing-seal-beach-ca/' ) ); ?>">Seal Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/roofing-redondo-beach-ca/' ) ); ?>">Redondo Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/roofing-manhattan-beach-ca/' ) ); ?>">Manhattan Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/roofing-hermosa-beach-ca/' ) ); ?>">Hermosa Beach</a>
+                        <a href="<?php echo esc_url( home_url( '/roofing-palos-verdes-ca/' ) ); ?>">Palos Verdes</a>
                     </div>
                 </details>
             </nav>
@@ -143,7 +153,7 @@ function golem_mobile_nav_render(): void {
                     <strong>12</strong><em>Years Experience</em>
                 </span>
                 <span class="golem-proof-card golem-proof-card--reviews">
-                    <strong>150+</strong><em>Verified Reviews</em>
+                    <strong>Reviews</strong><em>Trusted Profiles</em>
                 </span>
             </div>
 
