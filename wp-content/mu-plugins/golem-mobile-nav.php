@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Mobile Nav
  * Description: Mobile header polish, compact drawer navigation, and first-screen overlap fixes.
- * Version: 2.1.5
+ * Version: 2.1.6
  * Author: Golem Roofing Dev
  */
 
@@ -186,8 +186,26 @@ function golem_mobile_nav_render(): void {
             height: auto !important;
             max-width: 100%;
             min-height: 100% !important;
+            overscroll-behavior-x: none;
+            touch-action: pan-y pinch-zoom;
+            width: 100% !important;
             overflow-x: hidden !important;
             overflow-y: auto !important;
+        }
+
+        body,
+        #inner-body,
+        .aux-wrapper,
+        .aux-container,
+        .aux-primary,
+        .elementor,
+        .elementor-section,
+        .elementor-container,
+        .elementor-column,
+        .elementor-widget-wrap,
+        .e-con,
+        .e-con-inner {
+            max-width: 100vw !important;
         }
 
         html.golem-nav-open,
@@ -810,9 +828,12 @@ function golem_mobile_nav_render(): void {
         .home .elementor-element-950bb2d {
             align-self: center !important;
             box-shadow: none !important;
+            left: 50% !important;
             margin-left: auto !important;
             margin-right: auto !important;
             max-width: min(390px, calc(100vw - 40px)) !important;
+            position: relative !important;
+            transform: translateX(-50%) !important;
             width: calc(100vw - 40px) !important;
         }
 
@@ -939,10 +960,10 @@ function golem_mobile_nav_render(): void {
             top: 14px !important;
         }
 
-        body.dialog-lightbox-body .golem-mobile-header-shell,
-        body.dialog-lightbox-body .golem-mobile-brand,
-        body.dialog-lightbox-body .golem-mobile-quick,
-        body.dialog-lightbox-body .golem-hamburger {
+        html.golem-quote-popup-open .golem-mobile-header-shell,
+        html.golem-quote-popup-open .golem-mobile-brand,
+        html.golem-quote-popup-open .golem-mobile-quick,
+        html.golem-quote-popup-open .golem-hamburger {
             opacity: 0 !important;
             pointer-events: none !important;
             visibility: hidden !important;
@@ -1120,6 +1141,8 @@ function golem_mobile_nav_render(): void {
         var backdrop = document.getElementById('golem-nav-backdrop');
         var closeBtn = document.getElementById('golem-nav-close');
         var mobileMedia = window.matchMedia('(max-width: 767px)');
+        var quotePopupScrollY = null;
+        var quotePopupWasOpen = false;
 
         if (!btn || !drawer || !backdrop) {
             return;
@@ -1224,6 +1247,83 @@ function golem_mobile_nav_render(): void {
             footerCols.classList.add('golem-footer-accordion');
         }
 
+        function isVisiblePopup(element) {
+            if (!element) {
+                return false;
+            }
+
+            var style = window.getComputedStyle(element);
+            var rect = element.getBoundingClientRect();
+
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity || 1) > 0.05 &&
+                rect.width > 40 &&
+                rect.height > 40;
+        }
+
+        function syncPopupState() {
+            var popups = Array.prototype.slice.call(document.querySelectorAll('.elementor-popup-modal'));
+            var isPopupOpen = popups.some(isVisiblePopup);
+
+            document.documentElement.classList.toggle('golem-quote-popup-open', isPopupOpen);
+            document.body.classList.toggle('golem-quote-popup-open', isPopupOpen);
+
+            if (!isPopupOpen && quotePopupWasOpen && quotePopupScrollY !== null) {
+                window.setTimeout(function() {
+                    window.scrollTo(0, quotePopupScrollY);
+                    quotePopupScrollY = null;
+                }, 80);
+            }
+
+            quotePopupWasOpen = isPopupOpen;
+        }
+
+        function schedulePopupSync() {
+            window.requestAnimationFrame(syncPopupState);
+            window.setTimeout(syncPopupState, 120);
+            window.setTimeout(syncPopupState, 420);
+        }
+
+        var touchStartX = 0;
+        var touchStartY = 0;
+
+        document.addEventListener('touchstart', function(event) {
+            if (!mobileMedia.matches || event.touches.length !== 1) {
+                return;
+            }
+
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function(event) {
+            if (!mobileMedia.matches || event.touches.length !== 1) {
+                return;
+            }
+
+            var target = event.target;
+            if (target && target.closest && target.closest('input, textarea, select, .elementor-popup-modal, .golem-nav-drawer')) {
+                return;
+            }
+
+            var deltaX = event.touches[0].clientX - touchStartX;
+            var deltaY = event.touches[0].clientY - touchStartY;
+
+            if (Math.abs(deltaX) > Math.abs(deltaY) + 8) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        if (window.MutationObserver) {
+            new MutationObserver(schedulePopupSync).observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class', 'style', 'hidden', 'aria-hidden'],
+                childList: true,
+                subtree: true
+            });
+        }
+
         function setOpen(isOpen) {
             if (isOpen) {
                 drawer.removeAttribute('hidden');
@@ -1276,11 +1376,27 @@ function golem_mobile_nav_render(): void {
                 setOpen(false);
                 btn.focus();
             }
+
+            schedulePopupSync();
+        });
+
+        document.addEventListener('click', schedulePopupSync, true);
+
+        document.querySelectorAll('a[href*="popup%3Aopen"], a[href*="popup:open"]').forEach(function(link) {
+            if (!/quote|free/i.test(link.textContent || link.getAttribute('aria-label') || '')) {
+                return;
+            }
+
+            link.addEventListener('click', function() {
+                quotePopupScrollY = window.scrollY || window.pageYOffset || 0;
+                schedulePopupSync();
+            }, true);
         });
 
         mobileMedia.addEventListener('change', function() {
             syncHeaderState();
             buildFooterAccordion();
+            schedulePopupSync();
         });
 
         window.matchMedia('(min-width: 768px)').addEventListener('change', function(event) {
@@ -1292,6 +1408,7 @@ function golem_mobile_nav_render(): void {
         window.addEventListener('scroll', syncHeaderState, { passive: true });
         syncHeaderState();
         buildFooterAccordion();
+        schedulePopupSync();
     })();
     </script>
     <!-- /GOLEM-MOBILE-NAV -->
