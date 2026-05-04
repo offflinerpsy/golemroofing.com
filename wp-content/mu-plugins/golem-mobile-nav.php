@@ -828,12 +828,12 @@ function golem_mobile_nav_render(): void {
         .home .elementor-element-950bb2d {
             align-self: center !important;
             box-shadow: none !important;
-            left: 50% !important;
+            left: auto !important;
             margin-left: auto !important;
             margin-right: auto !important;
             max-width: min(390px, calc(100vw - 40px)) !important;
             position: relative !important;
-            transform: translateX(-50%) !important;
+            transform: none !important;
             width: calc(100vw - 40px) !important;
         }
 
