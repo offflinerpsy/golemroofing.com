@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem GEO Critical Fixes
  * Description: Small, reversible fixes for AI/GEO fact consistency and canonical links.
- * Version: 1.0.1
+ * Version: 1.0.5
  * Author: Golem Roofing Dev
  */
 
@@ -55,24 +55,60 @@ function golem_geo_critical_rewrite_owned_facts( string $html ): string {
         '8+ years of experience'                => 'over 12 years of combined hands-on roofing experience',
         '8+ Years of Roofing Experience'        => '12 Years of Combined Roofing Experience',
         '8+ Years Experience'                   => '12 Years Combined Experience',
+        '8Years Experience'                     => '12Years Experience',
         '10 Year Workmanship Warranty'          => '12 Year No-Leak Workmanship Warranty',
         '10-Year Workmanship Warranty'          => '12-Year No-Leak Workmanship Warranty',
         '10-year workmanship warranty'          => '12-year no-leak workmanship warranty',
+        '10-Year Warranty'                      => '12-Year Warranty',
+        '10-year warranty'                      => '12-year warranty',
         '15-Year Workmanship & 20+ Year Manufacturer Warranties' => '12-Year No-Leak Workmanship Warranty & Eligible Manufacturer Warranties',
         '15-year workmanship warranty'          => '12-year no-leak workmanship warranty',
         '20+ year manufacturer warranty'        => 'manufacturer warranty on eligible systems',
         '20+ Year Manufacturer Warranties'      => 'Eligible Manufacturer Warranties',
-        '$250K third-party guarantee through Directorii.' => 'third-party guarantee coverage; Directorii-backed projects may qualify for a $30,000 Guarantee.',
-        '$250K third-party guarantee through Directorii' => 'third-party guarantee coverage; Directorii-backed projects may qualify for a $30,000 Guarantee',
-        '| Third-Party Guarantee | $250K |' => '| Third-Party Protection | Directorii-backed projects may qualify for a $30,000 Guarantee; additional documented protection may apply |',
-        '$250K Guarantee\', \'Third-party backed by Directorii' => 'Third-Party Protection\', \'Directorii-backed guarantee where eligible',
-        '$250K Guarantee'                       => 'Third-Party Protection',
-        'Directorii ($250K)'                    => 'Directorii Guarantee',
-        '150+ verified 5-star reviews across platforms (Google, Yelp, BBB, Houzz, Directorii)' => 'verified reviews across trusted profiles including Google, Yelp, Directorii and local business listings',
-        '150+ verified 5-star reviews'          => 'verified reviews across trusted profiles',
+        '| Workmanship Warranty | 10 years |'   => '| Workmanship Warranty | 12 years No-Leak |',
+        '| Rating | 5.0 / 5 (47 reviews) |'     => '| Rating | 5.0 / 5 (200+ five-star reviews across trusted profiles) |',
+        '| Third-Party Guarantee | $250K |'     => '| Third-Party Protection | Up to $250K documented third-party protection where eligible |',
+        '$250K third-party guarantee through Directorii.' => '$250K third-party protection through Directorii.',
+        '$250K third-party guarantee through Directorii' => '$250K third-party protection through Directorii',
+        '$250K Guarantee\', \'Third-party backed by Directorii' => '$250K Protection\', \'Directorii-backed third-party protection',
+        '$250K Guarantee'                       => '$250K Protection',
+        '$250k Third-Party Guarantee'           => '$250k Third-Party Protection',
+        'Third-party backed by Directorii'      => 'Directorii-backed third-party protection',
+        '47 five-star reviews on Google'        => '200+ five-star reviews across trusted profiles',
+        '47 reviews'                            => '200+ reviews',
+        '23 Google + 49 Yelp five-star reviews' => '200+ five-star reviews across Google, Yelp, and trusted platforms',
+        '170+Five-Star Reviews'                 => '200+Five-Star Reviews',
+        '170+'                                  => '200+',
+        '5.0 Rating'                            => '200+ Reviews',
+        '150+ verified 5-star reviews across platforms (Google, Yelp, BBB, Houzz, Directorii)' => '200+ five-star reviews across Google, Yelp, and trusted profiles',
+        '150+ verified 5-star reviews'          => '200+ five-star reviews across trusted profiles',
+        'Licensed & Insured · 10-Year Warranty · Free Estimates' => 'Licensed & Insured · 12-Year No-Leak Warranty · CSLB #1140626',
+        'Los Angeles & Orange County'           => 'Long Beach & South Bay',
+        'Los Angeles and Orange County'         => 'Long Beach and the South Bay',
+        'across Los Angeles and Orange County, California' => 'across Long Beach, the South Bay, and nearby coastal communities',
+        'roofing and solar experts'             => 'roofing experts',
+        'roofing &amp; solar experts'           => 'roofing experts',
+        'roofing and solar solutions'           => 'roofing solutions',
+        'reduce energy costs with sustainable, high-performance solutions' => 'protect their property with durable, high-performance roofing solutions',
+        'protect their property and protect their property with' => 'protect their property with',
+        'Solar Panel Installation, Removal & Reinstallation' => 'Roof Inspection & Project Planning',
+        'Solar Panel Installation, Removal &amp; Reinstallation' => 'Roof Inspection &amp; Project Planning',
+        'Seamless integration with your roof to maximize performance and reduce energy costs.' => 'Clear roof assessments, scope planning, and material guidance before every project.',
+        'Seamless integration with your roof to maximize<br>performance and reduce energy costs.' => 'Clear roof assessments, scope planning,<br>and material guidance before every project.',
+        'Integrated Solar Systems'              => 'Roofing System Planning',
+        'We design and install solar systems that work seamlessly with your roof, cut your bills and boost property value.' => 'We plan durable roofing systems that protect Southern California homes and support long-term property value.',
+        '4126 E Ransom St, Long Beach, CA 90804' => '1821 E 5th St Unit #1, Long Beach, CA 90802',
+        '1821 E 5th St, Long Beach, CA 90802'   => '1821 E 5th St Unit #1, Long Beach, CA 90802',
     );
 
     $html = str_ireplace( array_keys( $replacements ), array_values( $replacements ), $html );
+
+    $html = preg_replace(
+        '/(<div class="elementor-element elementor-element-f9b2ec7\b.*?<h2 class="elementor-heading-title elementor-size-default">)5 star(<\/h2>)/is',
+        '${1}200+ Reviews${2}',
+        $html,
+        1
+    ) ?? $html;
 
     $html = preg_replace(
         '/"streetAddress"\s*:\s*"Long Beach"/',

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Blog SEO & Cross-Links
  * Description: Article Schema.org + cross-links (cities & services) + FAQ Schema + auto internal linking
- * Version: 3.0
+ * Version: 3.1
  */
 
 if (!defined('ABSPATH')) exit;
@@ -170,9 +170,7 @@ function golem_blog_crosslinks($content) {
         ['slug' => 'tpo-roofing', 'name' => 'TPO Roofing'],
         ['slug' => 'silicone-roof-coating', 'name' => 'Silicone Roof Coating'],
         ['slug' => 'shingle-roofing', 'name' => 'Shingle Roofing'],
-        ['slug' => 'solar-roofing', 'name' => 'Solar Roofing'],
         ['slug' => 'skylight-installation', 'name' => 'Skylight Installation'],
-        ['slug' => 'roof-financing', 'name' => 'Roof Financing'],
     ];
 
     $city_links = '';
@@ -228,14 +226,11 @@ function golem_blog_autolinks($content) {
         'roof maintenance'       => '/roof-maintenance/',
         'shingle roofing'        => '/shingle-roofing/',
         'metal roofing'          => '/metal-roofing/',
-        'solar roofing'          => '/solar-roofing/',
-        'roof financing'         => '/roof-financing/',
         'tpo roofing'            => '/tpo-roofing/',
         'roof repair'            => '/roof-repair/',
         'concrete tile'          => '/concrete-tile-roofing/',
         'silicone coating'       => '/silicone-roof-coating/',
         'metal roof'             => '/metal-roofing/',
-        'solar panel'            => '/solar-roofing/',
         'tpo roof'               => '/tpo-roofing/',
         'leak repair'            => '/roof-leak-repair/',
         'asphalt shingle'        => '/shingle-roofing/',

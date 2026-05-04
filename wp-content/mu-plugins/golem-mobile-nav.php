@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Mobile Nav
  * Description: Mobile header polish, compact drawer navigation, and first-screen overlap fixes.
- * Version: 2.1.6
+ * Version: 2.1.7
  * Author: Golem Roofing Dev
  */
 
@@ -149,13 +149,13 @@ function golem_mobile_nav_render(): void {
                     <strong>Google</strong><em>★★★★★</em>
                 </span>
                 <span class="golem-proof-card golem-proof-card--yelp">
-                    <strong>Yelp</strong><em>Verified</em>
+            <strong>Yelp</strong><em>★★★★★</em>
                 </span>
                 <span class="golem-proof-card golem-proof-card--years">
                     <strong>12</strong><em>Years Experience</em>
                 </span>
                 <span class="golem-proof-card golem-proof-card--reviews">
-                    <strong>Reviews</strong><em>Trusted Profiles</em>
+            <strong>200+</strong><em>Five-Star Reviews</em>
                 </span>
             </div>
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem GEO Engine
  * Description: GEO optimization — llms.txt, AI-friendly robots.txt, enhanced Schema.org, BreadcrumbList, city landing pages, service pages, About Us page, footer branding
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: Golem Roofing Dev Team
  */
 
@@ -153,20 +153,20 @@ function golem_geo_serve_llms(): void {
     $cities_list = implode(', ', array_map(fn($a) => $a['city'], $areas));
 
     // --- SHORT VERSION ---
-    $out = "# Golem Roofing — Professional Roofing Contractor in Los Angeles & Orange County\n\n";
-    $out .= "> Licensed, bonded, and insured roofing company serving {$cities_list}, and surrounding areas in California. Roof installation, replacement, repair, and silicone restoration with 15-year workmanship warranty.\n\n";
+    $out = "# Golem Roofing — Professional Roofing Contractor in Long Beach & South Bay\n\n";
+    $out .= "> Licensed, bonded, and insured roofing company serving {$cities_list}, and surrounding areas in California. Roof installation, replacement, repair, and silicone restoration with 12-year No-Leak workmanship warranty and 50-year manufacturer warranty.\n\n";
 
     $out .= "## Company Facts\n\n";
     $out .= "| Fact | Value |\n";
     $out .= "|------|-------|\n";
-    $out .= "| Founded | 2018 |\n";
-    $out .= "| Rating | 5.0 / 5 (47 reviews) |\n";
-    $out .= "| Workmanship Warranty | 15 years |\n";
-    $out .= "| Manufacturer Warranty | 20+ years |\n";
+    $out .= "| Founded | 2025 (over 12 years of combined hands-on roofing experience) |\n";
+    $out .= "| Rating | 5.0 / 5 (200+ five-star reviews across trusted profiles) |\n";
+    $out .= "| Workmanship Warranty | 12 years No-Leak |\n";
+    $out .= "| Manufacturer Warranty | 50 years |\n";
     $out .= "| Insurance | \$1M liability + \$25K bond |\n";
-    $out .= "| Third-Party Guarantee | \$250K |\n";
+    $out .= "| Third-Party Protection | Up to \$250K documented third-party protection where eligible |\n";
     $out .= "| Starting Price | \$9,900 (full roof) |\n";
-    $out .= "| Financing | From \$149/month via Acorn Finance |\n";
+    $out .= "| Certifications | GAF Certified, ASC Certified |\n";
     $out .= "| License | California CSLB Licensed |\n\n";
 
     $out .= "## Services\n\n";
@@ -318,8 +318,8 @@ function golem_geo_schema_homepage(): void {
         '@type'       => ['RoofingContractor', 'LocalBusiness'],
         '@id'         => 'https://golemroofing.com/#business',
         'name'        => 'Golem Roofing',
-        'alternateName' => 'Golem Roofing & Solar',
-        'description' => 'Professional roofing contractor serving Seal Beach, Long Beach, Manhattan Beach, Hermosa Beach, Redondo Beach, Palos Verdes, and surrounding areas in Los Angeles and Orange County, California. Licensed, bonded, insured. 15-year workmanship warranty.',
+        'alternateName' => 'Golem Roofing',
+        'description' => 'Professional roofing contractor serving Seal Beach, Long Beach, Manhattan Beach, Hermosa Beach, Redondo Beach, Palos Verdes, and surrounding areas in Long Beach and the South Bay, California. Licensed, bonded, insured. 12-year No-Leak workmanship warranty.',
         'url'         => 'https://golemroofing.com',
         'telephone'   => '+1-562-991-8165',
         'email'       => 'Golemroofing@gmail.com',
@@ -346,7 +346,7 @@ function golem_geo_schema_homepage(): void {
         'areaServed'  => $area_served,
         'priceRange'  => '$$$',
         'currenciesAccepted' => 'USD',
-        'paymentAccepted'    => 'Cash, Credit Card, Financing Available',
+        'paymentAccepted'    => 'Cash, Credit Card, Check',
         'openingHoursSpecification' => [
             [
                 '@type'     => 'OpeningHoursSpecification',
@@ -376,11 +376,11 @@ function golem_geo_schema_homepage(): void {
             'ratingValue' => '5.0',
             'bestRating'  => '5',
             'worstRating' => '1',
-            'ratingCount' => '47',
-            'reviewCount' => '47',
+            'ratingCount' => '192',
+            'reviewCount' => '192',
         ],
         'slogan'       => 'Power You Can Trust',
-        'foundingDate' => '2018',
+        'foundingDate' => '2025',
     ];
 
     golem_geo_emit_jsonld($schema);
@@ -618,8 +618,8 @@ function golem_geo_schema_breadcrumb(): void {
 function golem_geo_get_homepage_faqs(): array {
     return [
         [
-            'q' => 'How much does a new roof cost in Los Angeles?',
-            'a' => 'At Golem Roofing, new roof installations start from $9,900. The final price depends on roof size, material type, number of stories, and existing layers. We offer free estimates and flexible financing options starting at $149/month.',
+            'q' => 'How much does a new roof cost in Long Beach and the South Bay?',
+            'a' => 'At Golem Roofing, new roof installations start from $9,900. The final price depends on roof size, material type, number of stories, and existing layers. We offer free estimates — call (562) 991-8165.',
         ],
         [
             'q' => 'What areas do you serve in California?',
@@ -627,11 +627,11 @@ function golem_geo_get_homepage_faqs(): array {
         ],
         [
             'q' => 'Do you offer warranties on roofing work?',
-            'a' => 'Yes. We provide a 15-year workmanship warranty, 20+ year manufacturer warranty, $25K bond, $1M liability insurance, and a $250K third-party guarantee through Directorii.',
+            'a' => 'Yes. We provide a 12-year No-Leak workmanship warranty, 50-year manufacturer warranty, $1M liability insurance, $25K bond, and $250K third-party protection through Directorii where eligible.',
         ],
         [
-            'q' => 'Do you offer financing for roof replacement?',
-            'a' => 'Yes, we offer flexible financing through Acorn Finance. Full roof replacements can be financed from $149 per month with easy approval.',
+            'q' => 'Are you factory-certified by roofing manufacturers?',
+            'a' => 'Yes. Golem Roofing is officially certified by GAF and ASC (Associated Builders and Contractors). Our team undergoes rigorous training and follows strict manufacturer standards to ensure your roof is built to last with the best warranties in the industry.',
         ],
         [
             'q' => 'Are you a licensed roofing contractor?',
@@ -643,7 +643,7 @@ function golem_geo_get_homepage_faqs(): array {
         ],
         [
             'q' => 'What roofing materials do you use?',
-            'a' => 'We install GAF Timberline HDZ shingles, TPO membrane for flat roofs, clay and concrete tiles, and silicone coating systems. All materials come with manufacturer warranties of 20+ years.',
+            'a' => 'We install GAF Timberline HDZ shingles, TPO membrane for flat roofs, clay and concrete tiles, and silicone coating systems. All materials come with manufacturer warranties of up to 50 years.',
         ],
         [
             'q' => 'Do you handle emergency roof repairs?',
@@ -656,10 +656,6 @@ function golem_geo_get_homepage_faqs(): array {
         [
             'q' => 'Do I need a permit for roof work in California?',
             'a' => 'Most roof replacements in California require a building permit. As a licensed contractor, Golem Roofing handles all permit applications and inspections for you at no additional charge.',
-        ],
-        [
-            'q' => 'Can you work on roofs with solar panels?',
-            'a' => 'Yes, we regularly handle roofs with solar panels. We coordinate panel removal before roofing and reinstallation afterward, or install new solar systems on fresh roofs.',
         ],
         [
             'q' => 'How do I know if I need a roof repair or full replacement?',
@@ -706,10 +702,10 @@ function golem_geo_get_service_faqs(string $category): array {
     $all = [
         'installation' => [
             ['q' => 'How long does a new roof installation take?', 'a' => 'Most residential roof installations take 1-3 days depending on roof size, complexity, and weather conditions. Flat roof projects may take 2-4 days. Golem Roofing works efficiently to minimize disruption to your daily life.'],
-            ['q' => 'What roofing materials does Golem Roofing install?', 'a' => 'We install GAF Timberline HDZ architectural shingles, TPO membrane for flat roofs, clay and concrete tiles, and composite materials. All materials come with 20+ year manufacturer warranties.'],
+            ['q' => 'What roofing materials does Golem Roofing install?', 'a' => 'We install GAF Timberline HDZ architectural shingles, TPO membrane for flat roofs, clay and concrete tiles, and composite materials. All materials come with up to 50-year manufacturer warranties.'],
             ['q' => 'Do I need a permit for roof installation in California?', 'a' => 'Yes, most new roof installations in California require a building permit. As a CSLB-licensed contractor, Golem Roofing handles all permits and inspections at no additional charge.'],
-            ['q' => 'How much does a new roof cost in Los Angeles?', 'a' => 'New roof installations start from $9,900 depending on roof size, material, number of stories, and existing conditions. We offer free estimates and financing from $149/month through Acorn Finance.'],
-            ['q' => 'What warranty do you offer on new roof installations?', 'a' => 'Every Golem Roofing installation comes with a 15-year workmanship warranty, 20+ year manufacturer warranty, $1M liability insurance, $25K bond, and a $250K third-party guarantee through Directorii.'],
+            ['q' => 'How much does a new roof cost in Long Beach and the South Bay?', 'a' => 'New roof installations start from $9,900 depending on roof size, material, number of stories, and existing conditions. We offer free estimates — call (562) 991-8165.'],
+            ['q' => 'What warranty do you offer on new roof installations?', 'a' => 'Every Golem Roofing installation comes with a 12-year No-Leak workmanship warranty, 50-year manufacturer warranty, $1M liability insurance, $25K bond, and $250K third-party protection through Directorii where eligible.'],
         ],
         'replacement' => [
             ['q' => 'How do I know if I need a roof replacement?', 'a' => 'Signs you need replacement include: roof over 20 years old, widespread shingle damage, multiple leaks, sagging, daylight through roof boards, or excessive granule loss. Golem Roofing offers free inspections to help you decide.'],
@@ -806,12 +802,12 @@ function golem_geo_city_content(string $content): string {
 
     // Credentials
     $creds = [
-        ['🛡️', '15-Year Warranty', 'Workmanship guarantee on every project'],
-        ['📋', 'CSLB Licensed', 'California State License Board certified'],
+        ['🛡️', '12-Year Warranty', 'No-Leak guarantee on every project'],
+        ['📋', 'CSLB #1140626', 'California State License Board certified'],
         ['💰', '$1M Insurance', 'Full liability coverage + $25K bond'],
-        ['⭐', '5.0 Rating', '47 five-star reviews on Google'],
-        ['🏦', 'Financing', 'From $149/mo via Acorn Finance'],
-        ['🔒', '$250K Guarantee', 'Third-party backed by Directorii'],
+        ['⭐', '200+ Reviews', 'Google, Yelp, and trusted platforms'],
+        ['🏭', 'Factory-Certified', 'GAF and ASC certified experts'],
+        ['🔒', '$250K Protection', 'Directorii-backed third-party protection'],
     ];
     $cred_html = '';
     foreach ($creds as $c) {
@@ -962,7 +958,7 @@ function golem_geo_service_content(string $content): string {
     $faqs        = golem_geo_get_service_faqs($category);
     $site        = 'https://golemroofing.com';
     $cities_list = implode(', ', array_map(fn($a) => $a['city'], $areas));
-    $intro       = esc_html("Golem Roofing provides professional " . strtolower($match['name']) . " services across Los Angeles and Orange County, California. " . $desc . " We serve homeowners in " . $cities_list . " and surrounding areas.");
+    $intro       = esc_html("Golem Roofing provides professional " . strtolower($match['name']) . " services across Long Beach, the South Bay, and nearby coastal communities. " . $desc . " We serve homeowners in " . $cities_list . " and surrounding areas.");
 
     // City links
     $city_html = '';
@@ -1008,12 +1004,12 @@ function golem_geo_service_content(string $content): string {
 
     // Credentials
     $creds = [
-        ["\xF0\x9F\x9B\xA1\xEF\xB8\x8F", '15-Year Warranty', 'Workmanship guarantee on every project'],
-        ["\xF0\x9F\x93\x8B", 'CSLB Licensed', 'California State License Board certified'],
+        ["\xF0\x9F\x9B\xA1\xEF\xB8\x8F", '12-Year Warranty', 'No-Leak guarantee on every project'],
+        ["\xF0\x9F\x93\x8B", 'CSLB #1140626', 'California State License Board certified'],
         ["\xF0\x9F\x92\xB0", '$1M Insurance', 'Full liability coverage + $25K bond'],
-        ["\xE2\xAD\x90", '5.0 Rating', '47 five-star reviews on Google'],
-        ["\xF0\x9F\x8F\xA6", 'Financing', 'From $149/mo via Acorn Finance'],
-        ["\xF0\x9F\x94\x92", '$250K Guarantee', 'Third-party backed by Directorii'],
+        ["\xE2\xAD\x90", '200+ Reviews', 'Google, Yelp, and trusted platforms'],
+        ["\xF0\x9F\x8F\xAD", 'Factory-Certified', 'GAF and ASC certified experts'],
+        ["\xF0\x9F\x94\x92", '$250K Protection', 'Directorii-backed third-party protection'],
     ];
     $cred_html = '';
     foreach ($creds as $c) {
@@ -1022,10 +1018,10 @@ function golem_geo_service_content(string $content): string {
 
     // What's included
     $includes = [
-        'installation' => ['Free roof inspection and measurement', 'Old roof tear-off (if applicable)', 'Roof deck inspection and repair', 'Premium underlayment installation', 'New drip edge and flashing', 'Full material installation', 'Cleanup and debris removal', '15-year workmanship warranty'],
-        'replacement'  => ['Complete tear-off of existing roof', 'Deck inspection and structural repair', 'New underlayment and ice/water shield', 'New drip edge, flashing, and vents', 'Premium material installation', 'Ridge cap and finishing', 'Full cleanup and debris hauling', '15-year workmanship warranty'],
+        'installation' => ['Free roof inspection and measurement', 'Old roof tear-off (if applicable)', 'Roof deck inspection and repair', 'Premium underlayment installation', 'New drip edge and flashing', 'Full material installation', 'Cleanup and debris removal', '12-year No-Leak workmanship warranty'],
+        'replacement'  => ['Complete tear-off of existing roof', 'Deck inspection and structural repair', 'New underlayment and ice/water shield', 'New drip edge, flashing, and vents', 'Premium material installation', 'Ridge cap and finishing', 'Full cleanup and debris hauling', '12-year No-Leak workmanship warranty'],
         'repair'       => ['Thorough roof inspection', 'Leak source identification', 'Damaged material replacement', 'Flashing repair or replacement', 'Sealant and caulking', 'Before/after documentation', 'Repair warranty included'],
-        'special'      => ['Roof surface cleaning and prep', 'Seam and crack repair', 'Primer application', 'Silicone coating (2 coats)', 'Ponding water treatment', 'UV-reflective finish', 'No tear-off required', '15-year coating warranty'],
+        'special'      => ['Roof surface cleaning and prep', 'Seam and crack repair', 'Primer application', 'Silicone coating (2 coats)', 'Ponding water treatment', 'UV-reflective finish', 'No tear-off required', '12-year eligible coating warranty'],
     ];
     $inc_html = '';
     foreach (($includes[$category] ?? $includes['installation']) as $item) {
@@ -1089,8 +1085,8 @@ function golem_geo_service_content(string $content): string {
 <div class="gc-landing">
 
 <div class="gc-hero">
-<h1>{$name} in Los Angeles &amp; Orange County</h1>
-<p class="gc-subtitle">Licensed &amp; Insured &middot; 15-Year Warranty &middot; Free Estimates</p>
+<h1>{$name} in Long Beach &amp; South Bay</h1>
+<p class="gc-subtitle">Licensed &amp; Insured &middot; 12-Year No-Leak Warranty &middot; CSLB #1140626</p>
 <a href="tel:+15629918165" class="gc-cta-btn">&#128222; Call (562) 991-8165</a>
 </div>
 
@@ -1116,7 +1112,7 @@ function golem_geo_service_content(string $content): string {
 
 <div class="gc-cta-box">
 <h2>Get a Free {$name} Estimate</h2>
-<p>Contact us for a free inspection and detailed quote. Financing available from \$149/month.</p>
+<p>Contact us for a free inspection and detailed quote. Licensed, bonded, and insured.</p>
 <a href="#elementor-action%3Aaction%3Dpopup%3Aopen%26settings%3DeyJpZCI6Ijk3IiwidG9nZ2xlIjpmYWxzZX0%3D" class="gc-cta-btn">Get A Free Quote</a>
 <a href="tel:+15629918165" class="gc-phone">&#128222; (562) 991-8165</a>
 </div>
@@ -1181,14 +1177,14 @@ function golem_geo_about_content(string $content): string {
 
     // Credentials
     $creds = [
-        ['🛡️', '15-Year Warranty', 'Workmanship guarantee on every project'],
+        ['🛡️', '12-Year Warranty', 'No-Leak guarantee on every project'],
         ['📋', 'CSLB License #1140626', 'California State License Board certified'],
         ['💰', '$1M Insurance', 'Full liability coverage + $25K bond'],
-        ['⭐', '5.0 Rating', '47 five-star reviews on Google'],
-        ['🏦', 'Financing', 'From $149/mo via Acorn Finance'],
-        ['🔒', '$250K Guarantee', 'Third-party backed by Directorii'],
+        ['⭐', '200+ Reviews', 'Google, Yelp, and trusted platforms'],
+        ['🏭', 'Factory-Certified', 'GAF and ASC certified experts'],
+        ['🔒', '$250K Protection', 'Directorii-backed third-party protection'],
         ['🏅', 'GAF Certified™', 'Factory-certified roofing contractor'],
-        ['📜', 'Est. 2018', 'Licensed, insured, and bonded'],
+        ['📜', '12 Years Experience', 'Licensed, insured, and bonded'],
     ];
     $cred_html = '';
     foreach ($creds as $c) {
@@ -1266,16 +1262,16 @@ function golem_geo_about_content(string $content): string {
 
 <div class="gc-hero">
 <h1>About Golem Roofing</h1>
-<p class="gc-subtitle">Licensed Roofing Contractor — Los Angeles &amp; Orange County</p>
-<p class="gc-address">📍 1821 E 5th St, Long Beach, CA 90802</p>
-<p class="gc-license">CSLB License #1140626 · GAF Certified™ · Established 2018</p>
+<p class="gc-subtitle">Licensed Roofing Contractor — Long Beach &amp; South Bay</p>
+<p class="gc-address">📍 1821 E 5th St Unit #1, Long Beach, CA 90802</p>
+<p class="gc-license">CSLB License #1140626 · GAF Certified™ · 12 Years of Roofing Experience</p>
 <a href="tel:+15629918165" class="gc-cta-btn">📞 Call (562) 991-8165</a>
 </div>
 
 <div class="gc-section">
 <h2>Who We Are</h2>
 <p class="gc-about-text">
-Golem Roofing is a licensed, insured, and bonded roofing company serving homeowners across Los Angeles and Orange County, California. Founded in 2018, we specialize in roof installation, replacement, repair, and silicone restoration. As a GAF Certified™ contractor, we deliver premium roofing solutions backed by a 15-year workmanship warranty, \$1M liability insurance, and a \$250K third-party guarantee through Directorii.
+Golem Roofing is a licensed, insured, and bonded roofing company serving homeowners across Long Beach, the South Bay, and nearby coastal communities. With over 12 years of professional roofing experience, we specialize in roof installation, replacement, repair, and silicone restoration. As a GAF Certified™ contractor, we deliver premium roofing solutions backed by a 12-year No-Leak workmanship warranty, 50-year manufacturer warranty, \$1M liability insurance, and \$250K third-party protection through Directorii where eligible.
 </p>
 </div>
 
@@ -1375,3 +1371,19 @@ function golem_geo_footer_copyright_js(): void {
 </script>
 JS;
 }
+
+// --- CSS fixes: star ratings alignment + hide Financing sticker ---
+add_action('wp_head', 'golem_css_fixes', 999);
+function golem_css_fixes(): void {
+    echo '<style>
+/* Fix star rating section alignment on homepage */
+.elementor-star-rating{display:flex;align-items:center;justify-content:center}
+.elementor-widget-star-rating{display:flex;align-items:center;justify-content:center}
+/* Hide Financing badge/sticker globally */
+img[src*="Financing"],img[src*="financing"],img[alt*="Financing"],img[alt*="financing"]{display:none!important}
+a[href*="financing" i] img{display:none!important}
+.elementor-widget-aux_image img[src*="inancing"]{display:none!important}
+</style>' . "\n";
+}
+
+// Footer badges removed — now managed via Elementor HTML widget in footer template #67
