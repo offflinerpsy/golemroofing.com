@@ -159,8 +159,8 @@ function golem_geo_serve_llms(): void {
     $out .= "## Company Facts\n\n";
     $out .= "| Fact | Value |\n";
     $out .= "|------|-------|\n";
-    $out .= "| Founded | 2025 (over 12 years of combined hands-on roofing experience) |\n";
-    $out .= "| Rating | 5.0 / 5 (200+ five-star reviews across trusted profiles) |\n";
+    $out .= "| Founded | 2025 (8 years of roofing experience) |\n";
+    $out .= "| Rating | 5.0 / 5 (200 reviews across trusted profiles) |\n";
     $out .= "| Workmanship Warranty | 12 years No-Leak |\n";
     $out .= "| Manufacturer Warranty | 50 years |\n";
     $out .= "| Insurance | \$1M liability + \$25K bond |\n";
@@ -376,8 +376,8 @@ function golem_geo_schema_homepage(): void {
             'ratingValue' => '5.0',
             'bestRating'  => '5',
             'worstRating' => '1',
-            'ratingCount' => '192',
-            'reviewCount' => '192',
+            'ratingCount' => '200',
+            'reviewCount' => '200',
         ],
         'slogan'       => 'Power You Can Trust',
         'foundingDate' => '2025',
@@ -805,7 +805,7 @@ function golem_geo_city_content(string $content): string {
         ['🛡️', '12-Year Warranty', 'No-Leak guarantee on every project'],
         ['📋', 'CSLB #1140626', 'California State License Board certified'],
         ['💰', '$1M Insurance', 'Full liability coverage + $25K bond'],
-        ['⭐', '200+ Reviews', 'Google, Yelp, and trusted platforms'],
+        ['⭐', '200 Reviews', 'Google, Yelp, and trusted platforms'],
         ['🏭', 'Factory-Certified', 'GAF and ASC certified experts'],
         ['🔒', '$250K Protection', 'Directorii-backed third-party protection'],
     ];
@@ -1007,7 +1007,7 @@ function golem_geo_service_content(string $content): string {
         ["\xF0\x9F\x9B\xA1\xEF\xB8\x8F", '12-Year Warranty', 'No-Leak guarantee on every project'],
         ["\xF0\x9F\x93\x8B", 'CSLB #1140626', 'California State License Board certified'],
         ["\xF0\x9F\x92\xB0", '$1M Insurance', 'Full liability coverage + $25K bond'],
-        ["\xE2\xAD\x90", '200+ Reviews', 'Google, Yelp, and trusted platforms'],
+        ["\xE2\xAD\x90", '200 Reviews', 'Google, Yelp, and trusted platforms'],
         ["\xF0\x9F\x8F\xAD", 'Factory-Certified', 'GAF and ASC certified experts'],
         ["\xF0\x9F\x94\x92", '$250K Protection', 'Directorii-backed third-party protection'],
     ];
@@ -1180,11 +1180,11 @@ function golem_geo_about_content(string $content): string {
         ['🛡️', '12-Year Warranty', 'No-Leak guarantee on every project'],
         ['📋', 'CSLB License #1140626', 'California State License Board certified'],
         ['💰', '$1M Insurance', 'Full liability coverage + $25K bond'],
-        ['⭐', '200+ Reviews', 'Google, Yelp, and trusted platforms'],
+        ['⭐', '200 Reviews', 'Google, Yelp, and trusted platforms'],
         ['🏭', 'Factory-Certified', 'GAF and ASC certified experts'],
         ['🔒', '$250K Protection', 'Directorii-backed third-party protection'],
         ['🏅', 'GAF Certified™', 'Factory-certified roofing contractor'],
-        ['📜', '12 Years Experience', 'Licensed, insured, and bonded'],
+        ['📜', '8 Years Experience', 'Licensed, insured, and bonded'],
     ];
     $cred_html = '';
     foreach ($creds as $c) {
@@ -1264,14 +1264,14 @@ function golem_geo_about_content(string $content): string {
 <h1>About Golem Roofing</h1>
 <p class="gc-subtitle">Licensed Roofing Contractor — Long Beach &amp; South Bay</p>
 <p class="gc-address">📍 1821 E 5th St Unit #1, Long Beach, CA 90802</p>
-<p class="gc-license">CSLB License #1140626 · GAF Certified™ · 12 Years of Roofing Experience</p>
+<p class="gc-license">CSLB License #1140626 · GAF Certified™ · 8 Years of Roofing Experience</p>
 <a href="tel:+15629918165" class="gc-cta-btn">📞 Call (562) 991-8165</a>
 </div>
 
 <div class="gc-section">
 <h2>Who We Are</h2>
 <p class="gc-about-text">
-Golem Roofing is a licensed, insured, and bonded roofing company serving homeowners across Long Beach, the South Bay, and nearby coastal communities. With over 12 years of professional roofing experience, we specialize in roof installation, replacement, repair, and silicone restoration. As a GAF Certified™ contractor, we deliver premium roofing solutions backed by a 12-year No-Leak workmanship warranty, 50-year manufacturer warranty, \$1M liability insurance, and \$250K third-party protection through Directorii where eligible.
+Golem Roofing is a licensed, insured, and bonded roofing company serving homeowners across Long Beach, the South Bay, and nearby coastal communities. With 8 years of professional roofing experience, we specialize in roof installation, replacement, repair, and silicone restoration. As a GAF Certified™ contractor, we deliver premium roofing solutions backed by a 12-year No-Leak workmanship warranty, 50-year manufacturer warranty, \$1M liability insurance, and \$250K third-party protection through Directorii where eligible.
 </p>
 </div>
 

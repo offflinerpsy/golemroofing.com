@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Golem Mobile Nav
  * Description: Mobile header polish, compact drawer navigation, and first-screen overlap fixes.
- * Version: 2.1.7
+ * Version: 2.1.8
  * Author: Golem Roofing Dev
  */
 
@@ -24,9 +24,20 @@ function golem_mobile_nav_start_buffer(): void {
 function golem_mobile_nav_fix_experience_years( string $html ): string {
     return str_ireplace(
         array(
-            'With over 8 years of hands-on experience',
-            'over 8 years of hands-on experience',
-            'over 8 years',
+            'With over 12 years of hands-on experience',
+            'over 12 years of hands-on experience',
+            'over 12 years of combined hands-on roofing experience',
+            'over 12 years of professional roofing experience',
+            'over 12 years',
+            '12 Years of Roofing Experience',
+            '12 years of roofing experience',
+            '12 Years Experience',
+            '12 years experience',
+            '12Years Experience',
+            '200+Five-Star Reviews',
+            '200+ Reviews',
+            '200+ reviews',
+            '200+ five-star reviews',
             '8+ Years of Roofing Experience',
             '8+ years of roofing experience',
             '8+ Years Experience',
@@ -38,14 +49,25 @@ function golem_mobile_nav_fix_experience_years( string $html ): string {
             '15-Year Workmanship & 20+ Year Manufacturer Warranties',
         ),
         array(
-            'With over 12 years of hands-on experience',
-            'over 12 years of hands-on experience',
-            'over 12 years',
-            '12 Years of Roofing Experience',
-            '12 years of roofing experience',
-            '12 Years Experience',
-            '12 years experience',
-            'over 12 years of combined hands-on roofing experience',
+            'With 8 years of hands-on experience',
+            '8 years of hands-on experience',
+            '8 years of hands-on roofing experience',
+            '8 years of professional roofing experience',
+            '8 years',
+            '8 Years of Roofing Experience',
+            '8 years of roofing experience',
+            '8 Years Experience',
+            '8 years experience',
+            '8Years Experience',
+            '200 Five-Star Reviews',
+            '200 Reviews',
+            '200 reviews',
+            '200 five-star reviews',
+            '8 Years of Roofing Experience',
+            '8 years of roofing experience',
+            '8 Years Experience',
+            '8 years experience',
+            '8 years of experience',
             '12 Year No-Leak Workmanship Warranty',
             '12-Year No-Leak Workmanship Warranty',
             '12-year no-leak workmanship warranty',
@@ -152,10 +174,10 @@ function golem_mobile_nav_render(): void {
             <strong>Yelp</strong><em>★★★★★</em>
                 </span>
                 <span class="golem-proof-card golem-proof-card--years">
-                    <strong>12</strong><em>Years Experience</em>
+                    <strong>8</strong><em>Years Experience</em>
                 </span>
                 <span class="golem-proof-card golem-proof-card--reviews">
-            <strong>200+</strong><em>Five-Star Reviews</em>
+            <strong>200</strong><em>Five-Star Reviews</em>
                 </span>
             </div>
 
@@ -1155,26 +1177,6 @@ function golem_mobile_nav_render(): void {
                 event.stopImmediatePropagation();
             }, true);
         });
-
-        var homeTrustGrid = document.querySelector('.home .elementor-element-641fd80');
-        if (homeTrustGrid && !homeTrustGrid.querySelector('.golem-home-trust-card')) {
-            var bbbCard = document.createElement('div');
-            bbbCard.className = 'golem-home-trust-card';
-            bbbCard.innerHTML =
-                '<div class=\"golem-home-trust-card__media\"><img src=\"<?php echo esc_js( $bbb_url ); ?>\" alt=\"BBB Accredited Business\" loading=\"lazy\"></div>' +
-                '<div class=\"golem-home-trust-card__label\">BBB</div>';
-
-            var yearsCard = document.createElement('div');
-            yearsCard.className = 'golem-home-trust-card';
-            yearsCard.innerHTML =
-                '<div class=\"golem-home-trust-card__media\">' +
-                '<div class=\"golem-home-trust-card__badge\"><strong>12</strong><span>Years</span></div>' +
-                '</div>' +
-                '<div class=\"golem-home-trust-card__label\">Experience</div>';
-
-            homeTrustGrid.appendChild(bbbCard);
-            homeTrustGrid.appendChild(yearsCard);
-        }
 
         function syncHeaderState() {
             var header = document.querySelector('.elementor-location-header');
