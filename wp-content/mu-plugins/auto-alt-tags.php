@@ -43,7 +43,7 @@ function golem_generate_alt($post_id) {
 
     // 3. Fallback
     if (empty($alt)) {
-        $alt = 'Golem Roofing — professional roofing services in Los Angeles';
+        $alt = 'Golem Roofing — professional roofing services in Long Beach and the South Bay';
     }
 
     // Add branding if missing
