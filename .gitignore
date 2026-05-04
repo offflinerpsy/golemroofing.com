@@ -29,9 +29,17 @@ Thumbs.db
 # Debug
 debug.log
 error_log
+playwright-report/
+test-results/
 
 # One-time fix/diagnostic scripts
+/_*.php
 _diag*.php
 _fix*.php
 fix-*.php
 !wp-content/plugins/**/fix-*.php
+
+# Root-level generated QA/report artifacts
+/*.png
+/report_ai_visibility*
+/about-v2.*

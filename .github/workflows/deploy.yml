@@ -184,6 +184,37 @@ jobs:
             "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" \
             "cd '${{ env.DEPLOY_PATH }}' && wp cache flush --allow-root 2>/dev/null || true"
 
+      - name: Setup Node for post-deploy smoke
+        if: steps.manifest.outputs.has_files == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install smoke dependencies
+        if: steps.manifest.outputs.has_files == 'true'
+        run: npm ci
+
+      - name: Install Playwright browser
+        if: steps.manifest.outputs.has_files == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Post-deploy live smoke tests
+        if: steps.manifest.outputs.has_files == 'true'
+        env:
+          PLAYWRIGHT_BASE_URL: https://golemroofing.com
+        run: npm run smoke:live
+
+      - name: Upload Playwright report on failure
+        if: failure() && steps.manifest.outputs.has_files == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deploy-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+
       - name: Deployment summary
         shell: bash
         run: |

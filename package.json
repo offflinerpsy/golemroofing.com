@@ -1,0 +1,11 @@
+{
+  "name": "golemroofing-site-qa",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "smoke:live": "playwright test tests/live-smoke.spec.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}
